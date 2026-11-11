@@ -503,9 +503,20 @@ async function importBackup(file){
   try{
     const raw=JSON.parse(await file.text()),incoming=raw && raw.data ? raw.data : raw;
     if(!incoming || (!incoming.trip && !Array.isArray(incoming.trips)) || (!Array.isArray(incoming.tickets) && !Array.isArray(incoming.trips))) throw new Error('Invalid backup');
-    if(!confirm(`Restore backup for ${incoming.trip.city||'this trip'}?\n\nYour current Trip Lah! data will be kept as an automatic recovery snapshot.`)) return;
+    const incomingWorkspace=normalizeData(incoming);
+    const source=incomingWorkspace.trips?.[0]?.snapshot||incomingWorkspace;
+    const match=Array.isArray(data.trips)&&data.trips.find(t=>t.start===source.trip?.start&&t.end===source.trip?.end);
+    if(match){
+      if(!confirm(`Merge this backup into existing trip “${match.name}” (${match.start} to ${match.end})?\n\nOther trips will be kept. Current data will be saved as an automatic recovery snapshot.`)) return;
+      saveRecoverySnapshot();
+      const snapshot={...clone(source),version:5,trip:{...source.trip,city:match.name,country:match.destination||source.trip?.country||'',start:match.start,end:match.end},members:clone(match.members||source.members||[]),currencies:clone(match.currencies||source.currencies||['MYR']),baseCurrency:match.baseCurrency||source.baseCurrency||'MYR'};
+      const trips=data.trips.map(t=>t.id===match.id?{...t,snapshot,budget:Number(snapshot.budget??t.budget??0)}:t);
+      data={...snapshot,trips,activeTripId:match.id,version:5};
+      selectedTodayDate='';activePlaceFilter='All';save();toast('Backup merged into existing trip');showView('home');return;
+    }
+    if(!confirm(`Restore backup for ${incoming.trip?.city||'this trip'}?\n\nYour current Trip Lah! data will be kept as an automatic recovery snapshot.`)) return;
     saveRecoverySnapshot();
-    data=normalizeData(incoming);selectedTodayDate='';activePlaceFilter='All';save();toast('Trip backup restored');showView('home');
+    data=incomingWorkspace;selectedTodayDate='';activePlaceFilter='All';save();toast('Trip backup restored');showView('home');
   }catch{toast('Could not import this backup')}
 }
 function restoreRecovery(){
