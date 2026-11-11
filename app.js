@@ -5,6 +5,7 @@ const seed = {
   trip: { city:'Bangkok', country:'Thailand', start:'2026-12-12', end:'2026-12-16' },
   stay: { name:'Grande Centre Point', address:'Bangkok, Thailand', checkin:'15:00', checkout:'12:00', booking:'GCP-2719' },
   budget: 3000,
+  fundLedger: { transactions: [] },
   packing:[
     {id:'p1',name:'Passport',done:true},{id:'p2',name:'Wallet',done:true},{id:'p3',name:'Phone',done:true},{id:'p4',name:'Power bank',done:true},
     {id:'p5',name:'Charging cable',done:true},{id:'p6',name:'Travel adapter',done:true},{id:'p7',name:'Concert ticket',done:true},{id:'p8',name:'Hotel booking',done:true},
@@ -75,6 +76,7 @@ function normalizeData(saved){
     const merged={...base,...source,version:4};
     merged.trip={...base.trip,...(source.trip||{})};
     merged.stay={...base.stay,...(source.stay||{})};
+    merged.fundLedger={transactions:Array.isArray(source.fundLedger?.transactions)?source.fundLedger.transactions:[]};
     for(const key of ['packing','expenses','places','plans','tickets','gohome']) if(!Array.isArray(merged[key])) merged[key]=clone(base[key]);
     if(!('lastBackup' in merged)) merged.lastBackup='';
     return merged;
@@ -271,7 +273,42 @@ function moneyLabel(amount,code='MYR',digits=2){
   const symbols={MYR:'RM',THB:'฿',SGD:'S$',USD:'$',JPY:'¥',TWD:'NT$',EUR:'€',GBP:'£'};
   return `${symbols[code]||code+' '}${Number(amount||0).toFixed(code==='JPY'?0:digits)}`;
 }
+function fundBalances(){
+  const balances={};
+  (data.fundLedger?.transactions||[]).forEach(t=>{
+    const code=t.currency||data.baseCurrency||'MYR';
+    balances[code]=(balances[code]||0)+(t.direction==='in'?1:-1)*Number(t.amount||0);
+  });
+  return balances;
+}
+function renderFundLedger(){
+  if(!data.fundLedger||!Array.isArray(data.fundLedger.transactions))data.fundLedger={transactions:[]};
+  const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])];
+  qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('');
+  const list=data.fundLedger.transactions.slice().reverse();
+  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId);return `<div class="fund-transaction"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}</small></div><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong></div>`}).join('');
+  qs('#fundEmpty').classList.toggle('hidden',list.length>0);
+}
+function addFundTransaction(direction){
+  const members=(data.members||[]).map(m=>m.name);
+  if(!members.length)return toast('Add a traveller first');
+  const defaultCurrency=data.baseCurrency||'MYR';
+  simpleForm(direction==='in'?'Add to shared fund':'Record shared-fund expense',[
+    {label:'Description',name:'title',required:true,placeholder:direction==='in'?'Trip fund contribution':'Dinner / transport'},
+    {label:'Amount',name:'amount',type:'number',required:true,placeholder:'100'},
+    {label:'Currency',name:'currency',type:'select',value:defaultCurrency,options:[...new Set([defaultCurrency,...(data.currencies||[])])]},
+    {label:direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:members[0],options:members},
+    {label:'Date',name:'date',type:'date',value:localISO()},
+    {label:'Note',name:'note',placeholder:'Optional'}
+  ],f=>{
+    const amount=Number(f.amount);if(!(amount>0)){toast('Enter a valid amount');return}
+    const member=(data.members||[]).find(m=>m.name===f.memberName);
+    data.fundLedger.transactions.push({id:uid('fund_'),direction,type:direction==='in'?'contribution':'expense',title:f.title.trim(),amount,currency:f.currency,date:f.date,memberId:member?.id||'',note:f.note||'',createdAt:new Date().toISOString()});
+    save();toast(direction==='in'?'Contribution recorded':'Fund expense recorded');
+  });
+}
 function renderMoney(){
+  renderFundLedger();
   const spent=data.expenses.reduce((a,x)=>a+Number(x.rmAmount??x.amount??0),0),remaining=Number(data.budget||0)-spent;
   // Stage A keeps the legacy expense ledger in MYR. Multi-currency budget conversion arrives with the Stage B ledger.
   qs('#moneyBudget').textContent=`Budget RM ${Number(data.budget||0).toFixed(0)}`;
@@ -447,6 +484,8 @@ qsa('#placeFilters .chip').forEach(c=>c.addEventListener('click',()=>{activePlac
 qs('#addPlaceBtn').addEventListener('click',()=>addPlace());
 qs('#addPackBtn').addEventListener('click',()=>simpleForm('Add packing item',[{label:'Item',name:'name',required:true,placeholder:'Umbrella'}],f=>{data.packing.push({id:uid('p'),name:f.name,done:false});save();toast('Added to packing')}));
 qs('#editBudgetBtn').addEventListener('click',()=>simpleForm('Trip budget',[{label:'Budget (RM)',name:'budget',type:'number',value:data.budget,required:true}],f=>{data.budget=Math.max(0,Number(f.budget||0));save();toast('Budget updated')}));
+qs('#addFundContributionBtn').addEventListener('click',()=>addFundTransaction('in'));
+qs('#addFundExpenseBtn').addEventListener('click',()=>addFundTransaction('out'));
 qs('#addExpenseBtn').addEventListener('click',()=>openExpenseEditor());
 qs('#addPlanBtn').addEventListener('click',()=>addPlan());
 qs('#addTicketBtn').addEventListener('click',()=>openTicketEditor());
