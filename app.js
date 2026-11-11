@@ -316,6 +316,7 @@ function refundFundTransaction(id){
 }
 function voidFundTransaction(id){
   const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx||tx.status==='void')return;
+  if(tx.direction==='out'&&(data.fundLedger.transactions||[]).some(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void'))return toast('Void linked refund entries before voiding this expense');
   simpleForm('Void fund transaction',[{label:'Reason for voiding',name:'reason',required:true,placeholder:'Wrong member / duplicate entry'}],form=>{
     if(!confirm('Void this transaction? It will remain in history but will no longer affect the balance.'))return;
     tx.status='void';tx.voidedAt=new Date().toISOString();tx.voidReason=form.reason.trim();
@@ -343,6 +344,8 @@ function editFundTransaction(id){
     {label:'Note',name:'note',value:tx.note||'',placeholder:'Optional'}
   ],form=>{
     const amount=Number(form.amount);if(!(amount>0)){toast('Enter a valid amount');return}
+    const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+Number(t.amount||0),0);
+    if(tx.direction==='out'&&amount+0.000001<refunded){toast('Amount cannot be lower than refunds already recorded');return}
     const member=members.find(m=>m.name===form.memberName);
     tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'edit',at:new Date().toISOString(),before:{title:tx.title,amount:tx.amount,currency:tx.currency,date:tx.date,memberId:tx.memberId,note:tx.note}});
     Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,date:form.date,memberId:member?.id||'',note:form.note||''});
