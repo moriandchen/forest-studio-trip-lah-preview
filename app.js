@@ -43,11 +43,17 @@ const seed = {
   ]
 };
 
-const LS='travelLahV1';
-const OLD_KEYS=['travelLahV03','travelLahV02'];
-const RECOVERY_LS='travelLahV1Recovery';
-const CLOUD_SESSION_LS='travelLahCloudSessionV11';
-const CLOUD_META_LS='travelLahCloudMetaV11';
+// Trip Lah! owns a separate browser-storage namespace. One-time, non-destructive
+// migration copies this preview's prior local payload into the new namespace.
+const LEGACY_TRIP_LS='travelLahV1';
+const LS='tripLahV1';
+if(!localStorage.getItem(LS)&&localStorage.getItem(LEGACY_TRIP_LS)){
+  localStorage.setItem(LS,localStorage.getItem(LEGACY_TRIP_LS));
+}
+const OLD_KEYS=[];
+const RECOVERY_LS='tripLahV1Recovery';
+const CLOUD_SESSION_LS='tripLahCloudSessionV1';
+const CLOUD_META_LS='tripLahCloudMetaV1';
 const SUPABASE_URL='https://kxehariqixdqmtyeezrb.supabase.co';
 const SUPABASE_KEY='sb_publishable_-fTWxWaGAINGBQAePgh72A_CFr86NU7';
 const HAD_LOCAL_AT_START=!!localStorage.getItem(LS);
@@ -557,17 +563,17 @@ async function cloudFetch(path,options={}){
 }
 async function readCloud(){
   const s=await ensureCloudSession();if(!s)return null;
-  const rows=await cloudFetch(`/rest/v1/travel_lah_sync?select=payload,revision,updated_at&user_id=eq.${encodeURIComponent(s.userId)}`);
+  const rows=await cloudFetch(`/rest/v1/trip_lah_sync?select=payload,revision,updated_at&user_id=eq.${encodeURIComponent(s.userId)}`);
   return rows?.[0]||null;
 }
 async function createCloudCopy(){
   const s=await ensureCloudSession(); if(!s)return;
-  const rows=await cloudFetch('/rest/v1/travel_lah_sync',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:s.userId,payload:data,revision:1})});
+  const rows=await cloudFetch('/rest/v1/trip_lah_sync',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({user_id:s.userId,payload:data,revision:1})});
   const row=rows?.[0];cloudMeta={revision:Number(row?.revision||1),dirty:false,lastSyncedAt:row?.updated_at||new Date().toISOString(),conflict:false};saveCloudMeta();updateCloudUI();
 }
 async function updateCloudCopy(baseRevision,force=false){
   const s=await ensureCloudSession(); if(!s)return false;
-  let path=`/rest/v1/travel_lah_sync?user_id=eq.${encodeURIComponent(s.userId)}`;
+  let path=`/rest/v1/trip_lah_sync?user_id=eq.${encodeURIComponent(s.userId)}`;
   if(!force)path+=`&revision=eq.${Number(baseRevision||0)}`;
   const rows=await cloudFetch(path,{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({payload:data,revision:Number(baseRevision||0)+1})});
   if(!rows?.length)return false;
@@ -617,9 +623,9 @@ async function disconnectCloud(){
 }
 qs('#cloudStatusBtn')?.addEventListener('click',()=>{if(!cloudSession)qs('#cloudDialog').showModal();else showView('more')});
 qs('#cloudSetupBtn')?.addEventListener('click',()=>{if(!cloudSession)qs('#cloudDialog').showModal();else syncCloud({manual:true})});
-qs('#cloudForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=qs('#cloudEmail').value.trim(),password=qs('#cloudPassword').value;if(!email||!password)return;try{updateCloudUI('syncing');await signInCloud(email,password);qs('#cloudPassword').value='';qs('#cloudDialog').close();toast('Forest Studio Cloud connected')}catch(err){console.error(err);toast(err.message||'Could not sign in')}});
+qs('#cloudForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=qs('#cloudEmail').value.trim(),password=qs('#cloudPassword').value;if(!email||!password)return;try{updateCloudUI('syncing');await signInCloud(email,password);qs('#cloudPassword').value='';qs('#cloudDialog').close();toast('Trip Lah! Cloud connected')}catch(err){console.error(err);toast(err.message||'Could not sign in')}});
 qs('#cloudSyncNowBtn')?.addEventListener('click',()=>syncCloud({manual:true}));
-qs('#cloudDisconnectBtn')?.addEventListener('click',()=>{if(confirm('Disconnect Trip Lah! from Forest Studio Cloud on this device?\n\nYour local trip data will stay here.'))disconnectCloud()});
+qs('#cloudDisconnectBtn')?.addEventListener('click',()=>{if(confirm('Disconnect Trip Lah! from Trip Lah! Cloud on this device?\n\nYour local trip data will stay here.'))disconnectCloud()});
 qs('#cloudUseCloudBtn')?.addEventListener('click',async()=>{try{const remote=cloudRemoteSnapshot||await readCloud();if(!remote)return toast('No cloud copy found');if(!confirm('Replace this device copy with the cloud copy?\n\nYour current local copy will be kept as a recovery snapshot.'))return;applyCloudPayload(remote);toast('Cloud copy loaded')}catch{toast('Could not load cloud copy')}});
 qs('#cloudForcePushBtn')?.addEventListener('click',async()=>{try{const remote=cloudRemoteSnapshot||await readCloud();if(!remote)return; if(!confirm('Overwrite the cloud copy with this device copy?'))return;const ok=await updateCloudCopy(Number(remote.revision||0),true);if(ok)toast('This device copy is now in cloud')}catch{toast('Could not update cloud copy')}});
 window.addEventListener('online',()=>{updateCloudUI();scheduleCloudSync()});
