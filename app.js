@@ -286,8 +286,28 @@ function renderFundLedger(){
   const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])];
   qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('');
   const list=data.fundLedger.transactions.slice().reverse();
-  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId);return `<div class="fund-transaction"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}</small></div><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong></div>`}).join('');
+  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId);return `<div class="fund-transaction"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong><button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button></div></div>`}).join('');
+  qs('#fundTransactions').querySelectorAll('[data-fund-edit]').forEach(btn=>btn.addEventListener('click',()=>editFundTransaction(btn.dataset.fundEdit)));
   qs('#fundEmpty').classList.toggle('hidden',list.length>0);
+}
+function editFundTransaction(id){
+  const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx)return;
+  const members=(data.members||[]),currentMember=members.find(m=>m.id===tx.memberId);
+  const memberNames=[...new Set(members.map(m=>m.name))];
+  const currencies=[...new Set([tx.currency||data.baseCurrency||'MYR',data.baseCurrency||'MYR',...(data.currencies||[])])];
+  simpleForm('Edit fund transaction',[
+    {label:'Description',name:'title',value:tx.title||'',required:true},
+    {label:'Amount',name:'amount',type:'number',value:tx.amount,required:true},
+    {label:'Currency',name:'currency',type:'select',value:tx.currency||data.baseCurrency||'MYR',options:currencies},
+    {label:tx.direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:currentMember?.name||memberNames[0],options:memberNames},
+    {label:'Date',name:'date',type:'date',value:tx.date||localISO()},
+    {label:'Note',name:'note',value:tx.note||'',placeholder:'Optional'}
+  ],form=>{
+    const amount=Number(form.amount);if(!(amount>0)){toast('Enter a valid amount');return}
+    const member=members.find(m=>m.name===form.memberName);
+    Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,date:form.date,memberId:member?.id||'',note:form.note||''});
+    save();toast('Fund transaction updated');
+  });
 }
 function addFundTransaction(direction){
   const members=(data.members||[]).map(m=>m.name);
