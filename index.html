@@ -153,6 +153,16 @@
         <div id="homeChecklist" class="check-list"></div>
         <div id="readyHome" class="ready-message hidden">Ready to go home. ✈️</div>
       </section>
+      <section id="trips" class="view trips-page">
+        <div class="trips-page-heading">
+          <span class="eyebrow">YOUR JOURNEYS</span>
+          <h2>All Trips</h2>
+          <p>Each trip keeps its own members, currencies, plans and records.</p>
+        </div>
+        <div id="tripCards" class="trip-card-list"></div>
+        <button id="createTripBtn" class="primary-btn wide" type="button">＋ Create New Trip</button>
+      </section>
+
     </main>
 
     <button id="quickAdd" class="quick-add">＋ Quick Add</button>
@@ -243,7 +253,7 @@
     </form>
   </dialog>
 
-  <dialog id="tripsDialog" class="modal"><div class="modal-sheet"><div class="modal-head"><div><span class="eyebrow">YOUR JOURNEYS</span><h3>All Trips</h3></div><button type="button" class="dialogClose">×</button></div><p class="cloud-help">Each trip keeps its own members, currencies, plans and records.</p><div id="tripCards" class="trip-card-list"></div><button id="createTripBtn" class="primary-btn wide" type="button">＋ Create New Trip</button></div></dialog>
+
   <dialog id="membersDialog" class="modal"><div class="modal-sheet"><div class="modal-head"><div><span class="eyebrow">TRIP TEAM</span><h3 id="membersTitle">Members</h3></div><button type="button" class="dialogClose">×</button></div><div id="membersList" class="member-list"></div><button id="addMemberBtn" class="primary-btn wide" type="button">＋ Add member</button></div></dialog>
   <dialog id="currenciesDialog" class="modal"><div class="modal-sheet"><div class="modal-head"><div><span class="eyebrow">TRIP SETTINGS</span><h3 id="currenciesTitle">Currencies</h3></div><button type="button" class="dialogClose">×</button></div><p class="cloud-help">Choose one base currency for trip budgets and reporting. Historical expense conversions will be kept separately.</p><div id="currenciesFields"></div><button id="saveCurrenciesBtn" class="primary-btn wide" type="button">Save currencies</button></div></dialog>
   <div id="toast" class="toast" role="status"></div>
