@@ -343,12 +343,12 @@ function renderTripManager(){
   host.querySelectorAll('[data-trip-currencies]').forEach(b=>b.addEventListener('click',()=>manageCurrencies(b.dataset.tripCurrencies)));
   host.querySelectorAll('[data-trip-archive]').forEach(b=>b.addEventListener('click',()=>toggleTripArchive(b.dataset.tripArchive)));
 }
-function openTrips(){renderTripManager();qs('#tripsDialog').showModal()}
+function openTrips(){renderTripManager();showView('trips')}
 function switchTrip(id){
   syncActiveTripSnapshot();const record=data.trips.find(t=>t.id===id);if(!record)return;
   const trips=data.trips,snapshot=clone(record.snapshot||seed);
   data={...snapshot,version:5,trips,activeTripId:id,members:clone(record.members||[]),currencies:clone(record.currencies||['MYR']),baseCurrency:record.baseCurrency||'MYR'};
-  selectedTodayDate='';activePlaceFilter='All';save();if(qs('#tripsDialog').open)qs('#tripsDialog').close();showView('home');toast('Trip switched');
+  selectedTodayDate='';activePlaceFilter='All';save();showView('home');toast('Trip switched');
 }
 function createTrip(){
   simpleForm('Create a new trip',[
@@ -367,7 +367,7 @@ function createTrip(){
     fresh.members=[{id:uid('member_'),name:'You',role:'owner'}];fresh.currencies=[baseCurrency];fresh.baseCurrency=baseCurrency;
     const record={id,name:f.name.trim(),destination:f.destination.trim(),start:f.start,end:f.end,baseCurrency,budget:fresh.budget,status:'planning',members:clone(fresh.members),currencies:[baseCurrency],createdAt:new Date().toISOString(),snapshot:fresh};
     const trips=data.trips;trips.push(record);data={...fresh,version:5,trips,activeTripId:id};
-    selectedTodayDate='';activePlaceFilter='All';save();if(qs('#tripsDialog').open)qs('#tripsDialog').close();showView('home');toast('New trip created');
+    selectedTodayDate='';activePlaceFilter='All';save();showView('home');toast('New trip created');
   });
 }
 function editTrip(id){
@@ -665,4 +665,4 @@ window.addEventListener('pageshow',()=>{render();updateInstallUI()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){renderTrip();if(cloudSession)syncCloud()}});
 render();
 // Open All Trips after the first paint so the initial landing route is deterministic.
-window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>openTrips()));
+window.requestAnimationFrame(()=>showView('trips'));
