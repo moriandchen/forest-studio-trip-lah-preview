@@ -111,6 +111,14 @@
 
       <section id="money" class="view">
         <div class="page-head"><button class="back">←</button><div><span class="eyebrow">TRIP MONEY</span><h2>Money</h2></div><button id="editBudgetBtn" class="header-action">✎</button></div>
+        <section class="fund-panel">
+          <div class="fund-heading"><div><span class="eyebrow">SHARED TRAVEL FUND</span><h3>阿公钱</h3><p>One fund ledger for this trip</p></div><span class="fund-mark">🏦</span></div>
+          <div id="fundBalances" class="fund-balances"></div>
+          <div class="fund-actions"><button id="addFundContributionBtn" class="primary-btn">＋ Add money</button><button id="addFundExpenseBtn" class="soft-btn">－ Fund expense</button></div>
+          <div class="fund-subheading">FUND ACTIVITY</div>
+          <div id="fundTransactions" class="fund-transactions"></div>
+          <div id="fundEmpty" class="empty-state"><span>🏦</span><b>No fund activity yet.</b><small>Record contributions and shared expenses here.</small></div>
+        </section>
         <article class="money-hero"><small>Remaining</small><strong id="moneyRemaining">RM 2,158</strong><div><span id="moneyBudget">Budget RM 3,000</span><span id="moneySpent">Spent RM 842</span></div></article>
         <div id="expenseInsights" class="expense-insights"></div>
         <button id="addExpenseBtn" class="primary-btn wide">＋ Add travel expense</button>
