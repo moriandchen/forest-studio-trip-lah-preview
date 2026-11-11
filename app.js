@@ -276,6 +276,7 @@ function moneyLabel(amount,code='MYR',digits=2){
 function fundBalances(){
   const balances={};
   (data.fundLedger?.transactions||[]).forEach(t=>{
+    if(t.status==='void')return;
     const code=t.currency||data.baseCurrency||'MYR';
     balances[code]=(balances[code]||0)+(t.direction==='in'?1:-1)*Number(t.amount||0);
   });
@@ -286,9 +287,26 @@ function renderFundLedger(){
   const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])];
   qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('');
   const list=data.fundLedger.transactions.slice().reverse();
-  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId);return `<div class="fund-transaction"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong><button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button></div></div>`}).join('');
+  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button><button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
   qs('#fundTransactions').querySelectorAll('[data-fund-edit]').forEach(btn=>btn.addEventListener('click',()=>editFundTransaction(btn.dataset.fundEdit)));
+  qs('#fundTransactions').querySelectorAll('[data-fund-void]').forEach(btn=>btn.addEventListener('click',()=>voidFundTransaction(btn.dataset.fundVoid)));
+  qs('#fundTransactions').querySelectorAll('[data-fund-restore]').forEach(btn=>btn.addEventListener('click',()=>restoreFundTransaction(btn.dataset.fundRestore)));
   qs('#fundEmpty').classList.toggle('hidden',list.length>0);
+}
+function voidFundTransaction(id){
+  const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx||tx.status==='void')return;
+  simpleForm('Void fund transaction',[{label:'Reason for voiding',name:'reason',required:true,placeholder:'Wrong member / duplicate entry'}],form=>{
+    if(!confirm('Void this transaction? It will remain in history but will no longer affect the balance.'))return;
+    tx.status='void';tx.voidedAt=new Date().toISOString();tx.voidReason=form.reason.trim();
+    tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'void',at:tx.voidedAt,reason:tx.voidReason});
+    save();toast('Transaction voided · history retained');
+  });
+}
+function restoreFundTransaction(id){
+  const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx||tx.status!=='void')return;
+  if(!confirm('Restore this transaction and include it in the fund balance again?'))return;
+  tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'restore',at:new Date().toISOString(),reason:'Restored by user'});
+  tx.status='active';tx.restoredAt=new Date().toISOString();save();toast('Transaction restored');
 }
 function editFundTransaction(id){
   const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx)return;
@@ -305,8 +323,9 @@ function editFundTransaction(id){
   ],form=>{
     const amount=Number(form.amount);if(!(amount>0)){toast('Enter a valid amount');return}
     const member=members.find(m=>m.name===form.memberName);
+    tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'edit',at:new Date().toISOString(),before:{title:tx.title,amount:tx.amount,currency:tx.currency,date:tx.date,memberId:tx.memberId,note:tx.note}});
     Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,date:form.date,memberId:member?.id||'',note:form.note||''});
-    save();toast('Fund transaction updated');
+    save();toast('Fund transaction updated · edit recorded');
   });
 }
 function addFundTransaction(direction){
