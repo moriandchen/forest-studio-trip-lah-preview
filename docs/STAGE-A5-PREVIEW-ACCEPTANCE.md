@@ -23,7 +23,7 @@ PR: #1 (Draft)
 - [x] Two-trip workspace restores the selected trip and its own member/currency metadata.
 
 ## Manual acceptance checklist — still required
-- [ ] Desktop: first load shows All Trips.
+- [x] Desktop: first load shows All Trips (verified after full-page landing redesign).
 - [ ] Desktop: create two trips and switch between them.
 - [ ] Desktop: each trip retains separate dates, members, currencies and records after refresh.
 - [ ] iPad Safari: layout, modal controls, scrolling and keyboard input.
@@ -38,3 +38,10 @@ The branch is not deployed. Do not change the repository's production GitHub Pag
 
 ## Release gate
 Do not mark PR #1 ready for review or merge until the manual acceptance checklist passes and the additive relational migration has been separately reviewed.
+
+
+## Latest acceptance update
+- All Trips is implemented as a full-page route, not a modal dialog.
+- Fresh app load opens the All Trips page; selecting a trip opens its dashboard.
+- User-confirmed preview test: PASS.
+- Remaining manual acceptance items (iPad, iPhone, offline, Cloud Sync, backup/import) are still pending.
