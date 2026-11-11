@@ -82,3 +82,27 @@ button{touch-action:manipulation}
 .trips-page .trip-manager-card{padding:18px}
 .trips-page .trip-manager-card h4{font-size:20px}
 @media(min-width:760px){.trips-page .trip-card-list{max-height:none}}
+
+
+/* Stage C1 · shared travel fund */
+.fund-panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
+.fund-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fund-heading h3{font-size:22px;margin:5px 0 3px}
+.fund-heading p{font-size:11px;color:var(--muted);margin:0}
+.fund-mark{width:44px;height:44px;display:grid;place-items:center;border-radius:15px;background:var(--blue-soft);font-size:22px}
+.fund-balances{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}
+.fund-balance{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f7fafc;border-radius:13px;padding:12px;font-size:11px}
+.fund-balance span{color:var(--muted);font-weight:700}
+.fund-balance b{font-size:12px;white-space:nowrap}
+.fund-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.fund-actions .primary-btn,.fund-actions .soft-btn{margin:0;min-height:42px}
+.fund-subheading{font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--muted);margin:18px 0 9px}
+.fund-transactions{display:grid;gap:8px}
+.fund-transaction{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:14px}
+.fund-transaction>div{min-width:0}
+.fund-transaction b{display:block;font-size:11px;overflow-wrap:anywhere}
+.fund-transaction small{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.4}
+.fund-transaction strong{font-size:11px;white-space:nowrap}
+.fund-in{color:#34725f}.fund-out{color:#a65f5f}
+.fund-panel .empty-state{padding:18px 10px}
+@media(max-width:360px){.fund-balances{grid-template-columns:1fr}.fund-actions{grid-template-columns:1fr}}
