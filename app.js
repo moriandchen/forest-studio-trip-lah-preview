@@ -287,11 +287,32 @@ function renderFundLedger(){
   const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])];
   qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('');
   const list=data.fundLedger.transactions.slice().reverse();
-  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button><button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
+  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.type==='refund'?'↩':t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.type==='refund'?'Fund refund':t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button>${t.direction==='out'&&t.type!=='refund'?`<button type="button" class="fund-refund-btn" data-fund-refund="${esc(t.id)}">Refund</button>`:''}<button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
   qs('#fundTransactions').querySelectorAll('[data-fund-edit]').forEach(btn=>btn.addEventListener('click',()=>editFundTransaction(btn.dataset.fundEdit)));
   qs('#fundTransactions').querySelectorAll('[data-fund-void]').forEach(btn=>btn.addEventListener('click',()=>voidFundTransaction(btn.dataset.fundVoid)));
+  qs('#fundTransactions').querySelectorAll('[data-fund-refund]').forEach(btn=>btn.addEventListener('click',()=>refundFundTransaction(btn.dataset.fundRefund)));
   qs('#fundTransactions').querySelectorAll('[data-fund-restore]').forEach(btn=>btn.addEventListener('click',()=>restoreFundTransaction(btn.dataset.fundRestore)));
   qs('#fundEmpty').classList.toggle('hidden',list.length>0);
+}
+function refundFundTransaction(id){
+  const original=(data.fundLedger?.transactions||[]).find(t=>t.id===id);
+  if(!original||original.direction!=='out'||original.type==='refund'||original.status==='void')return;
+  const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+Number(t.amount||0),0);
+  const outstanding=Math.max(0,Number(original.amount||0)-refunded);
+  if(outstanding<=0.000001)return toast('This expense has already been fully refunded');
+  simpleForm('Record fund refund',[
+    {label:'Refund amount · max '+moneyLabel(outstanding,original.currency),name:'amount',type:'number',required:true,placeholder:String(outstanding)},
+    {label:'Reason',name:'reason',required:true,placeholder:'Merchant refund / cancelled booking'},
+    {label:'Date',name:'date',type:'date',value:localISO()},
+    {label:'Note',name:'note',placeholder:'Optional'}
+  ],form=>{
+    const amount=Number(form.amount);
+    if(!(amount>0)||amount>outstanding+0.000001){toast('Refund must be above zero and no more than the remaining amount');return}
+    if(!confirm('Record this refund back into the shared fund? The original expense will remain in history.'))return;
+    const now=new Date().toISOString();
+    data.fundLedger.transactions.push({id:uid('fund_'),direction:'in',type:'refund',title:'Refund: '+(original.title||'Fund expense'),amount,currency:original.currency||data.baseCurrency||'MYR',date:form.date,memberId:original.memberId||'',note:[form.reason.trim(),form.note].filter(Boolean).join(' · '),refundOf:original.id,createdAt:now,audit:[{action:'refund',at:now,originalTransactionId:original.id,reason:form.reason.trim()}]});
+    save();toast('Refund recorded · original expense retained');
+  });
 }
 function voidFundTransaction(id){
   const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx||tx.status==='void')return;
