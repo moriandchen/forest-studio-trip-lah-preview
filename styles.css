@@ -106,3 +106,7 @@ button{touch-action:manipulation}
 .fund-in{color:#34725f}.fund-out{color:#a65f5f}
 .fund-panel .empty-state{padding:18px 10px}
 @media(max-width:360px){.fund-balances{grid-template-columns:1fr}.fund-actions{grid-template-columns:1fr}}
+
+
+.fund-transaction-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.fund-edit-btn{border:0;background:#edf4fb;color:#376b94;border-radius:8px;padding:4px 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
