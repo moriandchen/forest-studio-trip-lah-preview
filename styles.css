@@ -71,3 +71,14 @@ button{touch-action:manipulation}
 #currenciesFields{margin-top:8px}
 #currenciesFields .field input,#currenciesFields .field select{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px;margin-top:7px;background:#fff;color:var(--ink)}
 @media(min-width:760px){.trip-card-list{max-height:62vh}}
+
+
+/* Trip Lah! All Trips is a first-class landing page, not a modal */
+.trips-page{padding:4px 0 28px}
+.trips-page-heading{margin:8px 0 20px}
+.trips-page-heading h2{font-size:28px;letter-spacing:-.03em;margin:7px 0}
+.trips-page-heading p{font-size:13px;line-height:1.55;color:var(--muted);margin:8px 0 0}
+.trips-page .trip-card-list{max-height:none;overflow:visible;margin:0 0 18px;padding:0;gap:14px}
+.trips-page .trip-manager-card{padding:18px}
+.trips-page .trip-manager-card h4{font-size:20px}
+@media(min-width:760px){.trips-page .trip-card-list{max-height:none}}
