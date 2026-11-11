@@ -117,3 +117,6 @@ button{touch-action:manipulation}
 .fund-transaction.is-void{opacity:.62;background:#fafafa}
 .fund-transaction.is-void>div:first-child b{text-decoration:line-through}
 .fund-void-tag{display:inline-block;margin-left:4px;padding:2px 5px;border-radius:5px;background:#fce8e5;color:#a24e43;font-size:8px;letter-spacing:.08em;vertical-align:middle}
+
+
+.fund-refund-btn{border:0;background:#eaf5ef;color:#34725f;border-radius:8px;padding:4px 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
