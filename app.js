@@ -285,7 +285,7 @@ function fundBalances(){
 function renderFundLedger(){
   if(!data.fundLedger||!Array.isArray(data.fundLedger.transactions))data.fundLedger={transactions:[]};
   const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])],base=data.baseCurrency||'MYR';
-  const converted=data.fundLedger.transactions.filter(t=>t.status!=='void'&&Number.isFinite(Number(t.baseAmount))).reduce((n,t)=>n+(t.direction==='in'?1:-1)*Number(t.baseAmount||0),0);
+  const converted=data.fundLedger.transactions.filter(t=>t.status!=='void'&&(Number.isFinite(Number(t.baseAmount))||(t.currency||base)===base)).reduce((n,t)=>n+(t.direction==='in'?1:-1)*(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
   const unconverted=data.fundLedger.transactions.filter(t=>t.status!=='void'&&(t.currency||base)!==base&&!Number.isFinite(Number(t.baseAmount))).length;
   qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('')+`<div class="fund-balance"><span>Converted total · ${esc(base)}</span><b>${moneyLabel(converted,base)}</b></div>`+(unconverted?`<small>${unconverted} older foreign-currency transaction(s) need an exchange rate before inclusion in the converted total.</small>`:'');
   const list=data.fundLedger.transactions.slice().reverse();
@@ -312,7 +312,7 @@ function refundFundTransaction(id){
     if(!(amount>0)||amount>outstanding+0.000001){toast('Refund must be above zero and no more than the remaining amount');return}
     if(!confirm('Record this refund back into the shared fund? The original expense will remain in history.'))return;
     const now=new Date().toISOString();
-    data.fundLedger.transactions.push({id:uid('fund_'),direction:'in',type:'refund',title:'Refund: '+(original.title||'Fund expense'),amount,currency:original.currency||data.baseCurrency||'MYR',date:form.date,memberId:original.memberId||'',note:[form.reason.trim(),form.note].filter(Boolean).join(' · '),refundOf:original.id,fxRate:original.fxRate,baseAmount:Number.isFinite(Number(original.fxRate))?Number((amount*Number(original.fxRate)).toFixed(2)):undefined,baseCurrency:data.baseCurrency||'MYR',createdAt:now,audit:[{action:'refund',at:now,originalTransactionId:original.id,reason:form.reason.trim()}]});
+    data.fundLedger.transactions.push({id:uid('fund_'),direction:'in',type:'refund',title:'Refund: '+(original.title||'Fund expense'),amount,currency:original.currency||data.baseCurrency||'MYR',date:form.date,memberId:original.memberId||'',note:[form.reason.trim(),form.note].filter(Boolean).join(' · '),refundOf:original.id,fxRate:original.fxRate??((original.currency||data.baseCurrency||'MYR')===(data.baseCurrency||'MYR')?1:undefined),baseAmount:Number.isFinite(Number(original.fxRate))?Number((amount*Number(original.fxRate)).toFixed(2)):((original.currency||data.baseCurrency||'MYR')===(data.baseCurrency||'MYR')?amount:undefined),baseCurrency:data.baseCurrency||'MYR',createdAt:now,audit:[{action:'refund',at:now,originalTransactionId:original.id,reason:form.reason.trim()}]});
     save();toast('Refund recorded · original expense retained');
   });
 }
