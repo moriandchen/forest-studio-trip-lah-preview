@@ -226,6 +226,12 @@ function renderPhaseAction(){
   }
   box.dataset.open=open;qs('#phaseActionLabel').textContent=label;qs('#phaseActionTitle').textContent=title;qs('#phaseActionMeta').textContent=meta;
 }
+function renderHomeBudget(){
+  const base=data.baseCurrency||'MYR';
+  const spent=(data.expenses||[]).reduce((sum,x)=>sum+(Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0)),0);
+  qs('#homeBudgetTotal').textContent=moneyLabel(Number(data.budget||0),base);
+  qs('#homeBudgetSpent').textContent=moneyLabel(spent,base);
+}
 function renderTrip(){
   qs('#greeting').textContent=greeting();
   qs('#tripCity').textContent=data.trip.city||'My Trip';
@@ -538,7 +544,7 @@ function manageCurrencies(id){
   qs('#currenciesFields').innerHTML=`<label class="field"><span>Base currency</span><select id="baseCurrencyInput">${['MYR','THB','SGD','USD','JPY','TWD','EUR','GBP'].map(c=>`<option ${c===(data.baseCurrency||'MYR')?'selected':''}>${c}</option>`).join('')}</select></label><label class="field"><span>Enabled currencies (comma separated)</span><input id="currencyListInput" value="${esc((data.currencies||['MYR']).join(', '))}" placeholder="MYR, THB, JPY"></label>`;
   qs('#currenciesDialog').showModal();
 }
-function render(){renderTrip();renderToday();renderPacking();renderMoney();renderPlaces();renderStay();renderTickets();renderGoHome();renderBackup();renderMode();renderTripManager()}
+function render(){renderTrip();renderHomeBudget();renderToday();renderPacking();renderMoney();renderPlaces();renderStay();renderTickets();renderGoHome();renderBackup();renderMode();renderTripManager()}
 
 function simpleForm(title,fields,onSave){
   qs('#simpleTitle').textContent=title;
