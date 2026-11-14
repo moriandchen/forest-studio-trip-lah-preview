@@ -304,11 +304,13 @@ function renderFundLedger(){
 function refundFundTransaction(id){
   const original=(data.fundLedger?.transactions||[]).find(t=>t.id===id);
   if(!original||original.direction!=='out'||original.type==='refund'||original.status==='void')return;
-  const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+Number(t.amount||0),0);
-  const outstanding=Math.max(0,Number(original.amount||0)-refunded);
+  const base=data.baseCurrency||'MYR';
+  const originalBase=Number.isFinite(Number(original.baseAmount))?Number(original.baseAmount):Number(original.amount||0);
+  const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
+  const outstanding=Math.max(0,originalBase-refunded);
   if(outstanding<=0.000001)return toast('This expense has already been fully refunded');
   simpleForm('Record fund refund',[
-    {label:'Refund amount · max '+moneyLabel(outstanding,original.currency),name:'amount',type:'number',required:true,placeholder:String(outstanding)},
+    {label:'Refund amount · max '+moneyLabel(outstanding,base),name:'amount',type:'number',required:true,placeholder:String(outstanding)},
     {label:'Reason',name:'reason',required:true,placeholder:'Merchant refund / cancelled booking'},
     {label:'Date',name:'date',type:'date',value:localISO()},
     {label:'Note',name:'note',placeholder:'Optional'}
