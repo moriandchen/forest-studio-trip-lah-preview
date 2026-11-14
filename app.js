@@ -274,32 +274,27 @@ function moneyLabel(amount,code='MYR',digits=2){
   return `${symbols[code]||code+' '}${Number(amount||0).toFixed(code==='JPY'?0:digits)}`;
 }
 function fundBalances(){
-  const balances={};
-  (data.fundLedger?.transactions||[]).forEach(t=>{
-    if(t.status==='void')return;
-    const code=t.currency||data.baseCurrency||'MYR';
-    balances[code]=(balances[code]||0)+(t.direction==='in'?1:-1)*Number(t.amount||0);
-  });
-  return balances;
+  const base=data.baseCurrency||'MYR';
+  return (data.fundLedger?.transactions||[]).filter(t=>t.status!=='void').reduce((total,t)=>{
+    const amount=Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0);
+    return total+(t.direction==='in'?1:-1)*amount;
+  },0);
 }
 function renderFundLedger(){
   if(!data.fundLedger||!Array.isArray(data.fundLedger.transactions))data.fundLedger={transactions:[]};
-  const balances=fundBalances(),codes=[...new Set([...(data.currencies||[data.baseCurrency||'MYR']),...Object.keys(balances)])],base=data.baseCurrency||'MYR';
-  const converted=data.fundLedger.transactions.filter(t=>t.status!=='void'&&(Number.isFinite(Number(t.baseAmount))||(t.currency||base)===base)).reduce((n,t)=>n+(t.direction==='in'?1:-1)*(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
-  const unconverted=data.fundLedger.transactions.filter(t=>t.status!=='void'&&(t.currency||base)!==base&&!Number.isFinite(Number(t.baseAmount))).length;
-  qs('#fundBalances').innerHTML=codes.map(code=>`<div class="fund-balance"><span>${esc(code)}</span><b>${moneyLabel(balances[code]||0,code)}</b></div>`).join('')+`<div class="fund-balance"><span>Converted total · ${esc(base)}</span><b>${moneyLabel(converted,base)}</b></div>`+(unconverted?`<small>${unconverted} older foreign-currency transaction(s) need an exchange rate before inclusion in the converted total.</small>`:'');
+  const base=data.baseCurrency||'MYR',balance=fundBalances();
+  qs('#fundBalances').innerHTML=`<div class="fund-balance"><span>Shared fund balance</span><b>${moneyLabel(balance,base)}</b></div>`;
   const contributionRows=(data.members||[]).map(member=>{
     const txs=data.fundLedger.transactions.filter(t=>t.status!=='void'&&t.type==='contribution'&&t.memberId===member.id);
-    let total=0,missing=0;
-    txs.forEach(t=>{if(Number.isFinite(Number(t.baseAmount)))total+=Number(t.baseAmount);else if((t.currency||base)===base)total+=Number(t.amount||0);else missing++});
-    return {name:member.name,total,count:txs.length,missing};
+    const total=txs.reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
+    return {name:member.name,total,count:txs.length};
   });
   const unassigned=data.fundLedger.transactions.filter(t=>t.status!=='void'&&t.type==='contribution'&&!t.memberId);
-  if(unassigned.length){let total=0,missing=0;unassigned.forEach(t=>{if(Number.isFinite(Number(t.baseAmount)))total+=Number(t.baseAmount);else if((t.currency||base)===base)total+=Number(t.amount||0);else missing++});contributionRows.push({name:'Unassigned',total,count:unassigned.length,missing})}
+  if(unassigned.length){const total=unassigned.reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);contributionRows.push({name:'Unassigned',total,count:unassigned.length})}
   const memberHost=qs('#fundMemberSummary');
-  if(memberHost)memberHost.innerHTML=contributionRows.length?contributionRows.map(m=>`<div class="fund-member-row"><span><b>${esc(m.name)}</b><small>${m.count} contribution(s)${m.missing?` · ${m.missing} awaiting rate`:''}</small></span><strong>${moneyLabel(m.total,base)}</strong></div>`).join(''):'<small>No contributions recorded yet.</small>';
+  if(memberHost)memberHost.innerHTML=contributionRows.length?contributionRows.map(m=>`<div class="fund-member-row"><span><b>${esc(m.name)}</b><small>${m.count} contribution(s)</small></span><strong>${moneyLabel(m.total,base)}</strong></div>`).join(''):'<small>No contributions recorded yet.</small>';
   const list=data.fundLedger.transactions.slice().reverse();
-  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.type==='refund'?'↩':t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.type==='refund'?'Fund refund':t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small>${Number.isFinite(Number(t.baseAmount))&&(t.currency||base)!==base?`<small>≈ ${moneyLabel(t.baseAmount,base)} · rate ${Number(t.fxRate).toFixed(6)}</small>`:''}</div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button>${t.direction==='out'&&t.type!=='refund'?`<button type="button" class="fund-refund-btn" data-fund-refund="${esc(t.id)}">Refund</button>`:''}<button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
+  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.type==='refund'?'↩':t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.type==='refund'?'Fund refund':t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button>${t.direction==='out'&&t.type!=='refund'?`<button type="button" class="fund-refund-btn" data-fund-refund="${esc(t.id)}">Refund</button>`:''}<button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
   qs('#fundTransactions').querySelectorAll('[data-fund-edit]').forEach(btn=>btn.addEventListener('click',()=>editFundTransaction(btn.dataset.fundEdit)));
   qs('#fundTransactions').querySelectorAll('[data-fund-void]').forEach(btn=>btn.addEventListener('click',()=>voidFundTransaction(btn.dataset.fundVoid)));
   qs('#fundTransactions').querySelectorAll('[data-fund-refund]').forEach(btn=>btn.addEventListener('click',()=>refundFundTransaction(btn.dataset.fundRefund)));
@@ -322,7 +317,7 @@ function refundFundTransaction(id){
     if(!(amount>0)||amount>outstanding+0.000001){toast('Refund must be above zero and no more than the remaining amount');return}
     if(!confirm('Record this refund back into the shared fund? The original expense will remain in history.'))return;
     const now=new Date().toISOString();
-    data.fundLedger.transactions.push({id:uid('fund_'),direction:'in',type:'refund',title:'Refund: '+(original.title||'Fund expense'),amount,currency:original.currency||data.baseCurrency||'MYR',date:form.date,memberId:original.memberId||'',note:[form.reason.trim(),form.note].filter(Boolean).join(' · '),refundOf:original.id,fxRate:original.fxRate??((original.currency||data.baseCurrency||'MYR')===(data.baseCurrency||'MYR')?1:undefined),baseAmount:Number.isFinite(Number(original.fxRate))?Number((amount*Number(original.fxRate)).toFixed(2)):((original.currency||data.baseCurrency||'MYR')===(data.baseCurrency||'MYR')?amount:undefined),baseCurrency:data.baseCurrency||'MYR',createdAt:now,audit:[{action:'refund',at:now,originalTransactionId:original.id,reason:form.reason.trim()}]});
+    data.fundLedger.transactions.push({id:uid('fund_'),direction:'in',type:'refund',title:'Refund: '+(original.title||'Fund expense'),amount,currency:data.baseCurrency||'MYR',date:form.date,memberId:original.memberId||'',note:[form.reason.trim(),form.note].filter(Boolean).join(' · '),refundOf:original.id,baseAmount:amount,baseCurrency:data.baseCurrency||'MYR',createdAt:now,audit:[{action:'refund',at:now,originalTransactionId:original.id,reason:form.reason.trim()}]});
     save();toast('Refund recorded · original expense retained');
   });
 }
@@ -345,72 +340,58 @@ function restoreFundTransaction(id){
 function editFundTransaction(id){
   const tx=(data.fundLedger?.transactions||[]).find(t=>t.id===id);if(!tx)return;
   const members=(data.members||[]),currentMember=members.find(m=>m.id===tx.memberId);
-  const memberNames=[...new Set(members.map(m=>m.name))];
-  const currencies=[...new Set([tx.currency||data.baseCurrency||'MYR',data.baseCurrency||'MYR',...(data.currencies||[])])];
+  const memberNames=[...new Set(members.map(m=>m.name))],base=data.baseCurrency||'MYR';
+  const currentAmount=Number.isFinite(Number(tx.baseAmount))?Number(tx.baseAmount):Number(tx.amount||0);
   simpleForm('Edit fund transaction',[
     {label:'Description',name:'title',value:tx.title||'',required:true},
-    {label:'Amount',name:'amount',type:'number',value:tx.amount,required:true},
-    {label:'Currency',name:'currency',type:'select',value:tx.currency||data.baseCurrency||'MYR',options:currencies},
-    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',value:String(tx.fxRate??data.fxRates?.[tx.currency]??(tx.currency===(data.baseCurrency||'MYR')?1:'')),placeholder:'Use trip default rate'},
+    {label:`Amount · ${base}`,name:'amount',type:'number',value:currentAmount,required:true},
     {label:tx.direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:currentMember?.name||memberNames[0],options:memberNames},
     {label:'Date',name:'date',type:'date',value:tx.date||localISO()},
     {label:'Note',name:'note',value:tx.note||'',placeholder:'Optional'}
   ],form=>{
-    const amount=Number(form.amount),baseCurrency=data.baseCurrency||'MYR',fxRate=Number(form.fxRate)||Number(data.fxRates?.[form.currency])||(form.currency===baseCurrency?1:0);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Set a trip exchange rate first, or enter one here');return}
-    const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+Number(t.amount||0),0);
+    const amount=Number(form.amount);if(!(amount>0)){toast('Enter a valid amount');return}
+    const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
     if(tx.direction==='out'&&amount+0.000001<refunded){toast('Amount cannot be lower than refunds already recorded');return}
     const member=members.find(m=>m.name===form.memberName);
     tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'edit',at:new Date().toISOString(),before:{title:tx.title,amount:tx.amount,currency:tx.currency,date:tx.date,memberId:tx.memberId,note:tx.note}});
-    Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,fxRate,baseAmount:Number((amount*fxRate).toFixed(2)),baseCurrency,date:form.date,memberId:member?.id||'',note:form.note||''});
+    Object.assign(tx,{title:form.title.trim(),amount,currency:base,baseAmount:amount,baseCurrency:base,date:form.date,memberId:member?.id||'',note:form.note||''});
+    delete tx.fxRate;
     save();toast('Fund transaction updated · edit recorded');
   });
 }
-function editTripFxRates(){
-  const base=data.baseCurrency||'MYR',codes=[...new Set((data.currencies||['MYR','THB','SGD','USD']).filter(c=>c!==base))];
-  if(!codes.length)return toast('No foreign currencies configured for this trip');
-  simpleForm('Trip exchange rates · 1 foreign currency = ? '+base,codes.map(code=>({label:`1 ${code} = ? ${base}`,name:code,type:'number',value:String(data.fxRates?.[code]??''),placeholder:'Enter your usual trip rate'})),f=>{
-    data.fxRates=data.fxRates||{};
-    codes.forEach(code=>{const rate=Number(f[code]);if(rate>0)data.fxRates[code]=rate;else delete data.fxRates[code]});
-    save();toast('Trip exchange rates saved');
-  });
-}
-qs('#editFxRatesBtn')?.addEventListener('click',editTripFxRates);
-
 function addFundTransaction(direction){
   const members=(data.members||[]).map(m=>m.name);
   if(!members.length)return toast('Add a traveller first');
-  const defaultCurrency=data.baseCurrency||'MYR';
+  const base=data.baseCurrency||'MYR';
   simpleForm(direction==='in'?'Add to shared fund':'Record shared-fund expense',[
     {label:'Description',name:'title',required:true,placeholder:direction==='in'?'Trip fund contribution':'Dinner / transport'},
-    {label:'Amount',name:'amount',type:'number',required:true,placeholder:'100'},
-    {label:'Currency',name:'currency',type:'select',value:defaultCurrency,options:[...new Set([defaultCurrency,...(data.currencies||[])])]},
-    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',placeholder:'Use trip default rate'},
+    {label:`Amount · ${base}`,name:'amount',type:'number',required:true,placeholder:'100'},
     {label:direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:members[0],options:members},
     {label:'Date',name:'date',type:'date',value:localISO()},
     {label:'Note',name:'note',placeholder:'Optional'}
   ],f=>{
-    const amount=Number(f.amount),baseCurrency=data.baseCurrency||'MYR',fxRate=Number(f.fxRate)||Number(data.fxRates?.[f.currency])||(f.currency===baseCurrency?1:0);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Set a trip exchange rate first, or enter one here');return}
+    const amount=Number(f.amount);if(!(amount>0)){toast('Enter a valid amount');return}
     const member=(data.members||[]).find(m=>m.name===f.memberName);
-    data.fundLedger.transactions.push({id:uid('fund_'),direction,type:direction==='in'?'contribution':'expense',title:f.title.trim(),amount,currency:f.currency,fxRate,baseAmount:Number((amount*fxRate).toFixed(2)),baseCurrency,date:f.date,memberId:member?.id||'',note:f.note||'',createdAt:new Date().toISOString()});
+    data.fundLedger.transactions.push({id:uid('fund_'),direction,type:direction==='in'?'contribution':'expense',title:f.title.trim(),amount,currency:base,baseAmount:amount,baseCurrency:base,date:f.date,memberId:member?.id||'',note:f.note||'',createdAt:new Date().toISOString()});
     save();toast(direction==='in'?'Contribution recorded':'Fund expense recorded');
   });
 }
 function renderMoney(){
   renderFundLedger();
-  const spent=data.expenses.reduce((a,x)=>a+Number(x.rmAmount??x.amount??0),0),remaining=Number(data.budget||0)-spent;
+  const spent=data.expenses.reduce((a,x)=>a+(Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0)),0),remaining=Number(data.budget||0)-spent;
   const baseCurrency=data.baseCurrency||'MYR';
   qs('#moneyBudget').textContent=`Budget ${moneyLabel(Number(data.budget||0),baseCurrency)}`;
   qs('#moneySpent').textContent=`Spent ${moneyLabel(spent,baseCurrency)}`;
   qs('#moneyRemaining').textContent=moneyLabel(remaining,baseCurrency);
   qs('#moneySmall').textContent=`${moneyLabel(remaining,baseCurrency)} left`;
   const byCategory={},byDate={};
-  data.expenses.forEach(x=>{const rm=Number(x.rmAmount??x.amount??0),category=x.category||'Other',date=x.date||data.trip.start||'';byCategory[category]=(byCategory[category]||0)+rm;if(date)byDate[date]=(byDate[date]||0)+rm});
+  data.expenses.forEach(x=>{const rm=Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0),category=x.category||'Other',date=x.date||data.trip.start||'';byCategory[category]=(byCategory[category]||0)+rm;if(date)byDate[date]=(byDate[date]||0)+rm});
   const categories=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]),dates=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0]));
-  qs('#expenseInsights').innerHTML=data.expenses.length?`<div class="insight-section"><div class="insight-heading">BY CATEGORY</div><div class="expense-category-grid">${categories.map(([name,total])=>`<div class="expense-category"><span>${esc(name)}</span><b>${moneyLabel(total,baseCurrency)}</b></div>`).join('')}</div></div><div class="insight-section"><div class="insight-heading">DAILY TOTALS</div><div class="daily-expense-list">${dates.map(([date,total])=>`<div><span>${esc(fmtDate(date,{day:'numeric',month:'short'}))}</span><b>${moneyLabel(total,'MYR')}</b></div>`).join('')}</div></div>`:'';
+  qs('#expenseInsights').innerHTML=data.expenses.length?`<div class="insight-section"><div class="insight-heading">BY CATEGORY</div><div class="expense-category-grid">${categories.map(([name,total])=>`<div class="expense-category"><span>${esc(name)}</span><b>${moneyLabel(total,baseCurrency)}</b></div>`).join('')}</div></div><div class="insight-section"><div class="insight-heading">DAILY TOTALS</div><div class="daily-expense-list">${dates.map(([date,total])=>`<div><span>${esc(fmtDate(date,{day:'numeric',month:'short'}))}</span><b>${moneyLabel(total,baseCurrency)}</b></div>`).join('')}</div></div>`:'';
   const categoryIcons={Food:'🍜',Transport:'🚆',Shopping:'🛍️',Accommodation:'🏨',Tickets:'🎫',Other:'🧾'};
   qs('#expenseList').innerHTML=data.expenses.slice().reverse().map(x=>{
-    const currency=x.currency||'MYR',amount=Number(x.amount??0),rm=Number(x.rmAmount??x.amount??0),foreign=currency!=='MYR';
-    return `<div class="expense-item"><div class="expense-main"><span class="expense-icon">${categoryIcons[x.category||'Other']||'🧾'}</span><div class="expense-copy"><b>${esc(x.name)}</b><small>${esc(x.category||'Other')} · ${esc(fmtDate(x.date||data.trip.start,{day:'numeric',month:'short'}))}</small></div></div><div class="expense-value"><b>${moneyLabel(amount,currency)}</b>${foreign?`<small>≈ ${moneyLabel(rm,baseCurrency)}</small>`:''}<div class="row-actions"><button data-expense-edit="${x.id}" aria-label="Edit expense">✎</button><button class="row-delete" data-expense-delete="${x.id}" aria-label="Delete expense">×</button></div></div></div>`;
+    const amount=Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0);
+    return `<div class="expense-item"><div class="expense-main"><span class="expense-icon">${categoryIcons[x.category||'Other']||'🧾'}</span><div class="expense-copy"><b>${esc(x.name)}</b><small>${esc(x.category||'Other')} · ${esc(fmtDate(x.date||data.trip.start,{day:'numeric',month:'short'}))}</small></div></div><div class="expense-value"><b>${moneyLabel(amount,baseCurrency)}</b><div class="row-actions"><button data-expense-edit="${x.id}" aria-label="Edit expense">✎</button><button class="row-delete" data-expense-delete="${x.id}" aria-label="Delete expense">×</button></div></div></div>`;
   }).join('');
   qs('#expenseEmpty').classList.toggle('hidden',data.expenses.length>0);
   qsa('[data-expense-edit]').forEach(b=>b.addEventListener('click',()=>openExpenseEditor(b.dataset.expenseEdit)));
@@ -584,16 +565,21 @@ qs('#resetGoHomeBtn').addEventListener('click',()=>{data.gohome.forEach(x=>x.don
 
 function addPlace(){simpleForm('Add place',[{label:'Place',name:'name',required:true,placeholder:'Siam Paragon'},{label:'Category',name:'category',type:'select',value:'All',options:['All','Must go','Food','Shopping']},{label:'Note',name:'note',placeholder:'Optional'}],f=>{data.places.unshift({id:uid('l'),icon:'📍',name:f.name,category:f.category,note:f.note});save();toast('Place saved')})}
 function openExpenseEditor(id=''){
-  const x=data.expenses.find(item=>item.id===id)||{id:'',name:'',category:'Food',date:selectedTodayDate||((localISO()>=data.trip.start&&localISO()<=data.trip.end)?localISO():data.trip.start),currency:'THB',amount:'',rmAmount:''};
-  const currency=x.currency||'MYR',legacyRate=Number(x.amount)>0&&Number(x.rmAmount)>0?Number(x.rmAmount)/Number(x.amount):Number(data.fxRates?.[currency])||1;
-  qs('#expenseDialogTitle').textContent=id?'Edit travel expense':'Add travel expense';qs('#expenseEditId').value=x.id||'';qs('#expenseDate').value=x.date||data.trip.start;qs('#expenseCategory').value=['Food','Transport','Shopping','Accommodation','Tickets','Other'].includes(x.category)?x.category:'Other';qs('#expenseName').value=x.name||'';qs('#expenseCurrency').value=['THB','MYR','SGD','USD'].includes(currency)?currency:'MYR';qs('#expenseAmount').value=x.amount??'';qs('#expenseFxRate').value=String(x.fxRate??data.fxRates?.[currency]??(currency===(data.baseCurrency||'MYR')?1:legacyRate));updateExpenseCurrencyFields();updateExpenseEquivalent();qs('#expenseDialog').showModal();
+  const x=data.expenses.find(item=>item.id===id)||{id:'',name:'',category:'Food',date:selectedTodayDate||((localISO()>=data.trip.start&&localISO()<=data.trip.end)?localISO():data.trip.start),amount:''};
+  const base=data.baseCurrency||'MYR';
+  const amount=Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0);
+  qs('#expenseDialogTitle').textContent=id?'Edit travel expense':'Add travel expense';qs('#expenseEditId').value=x.id||'';qs('#expenseDate').value=x.date||data.trip.start;qs('#expenseCategory').value=['Food','Transport','Shopping','Accommodation','Tickets','Other'].includes(x.category)?x.category:'Other';qs('#expenseName').value=x.name||'';qs('#expenseAmount').value=amount||'';qs('#expenseAmountLabel').textContent='Amount · '+base;qs('#expenseDialog').showModal();
 }
-function updateExpenseCurrencyFields(){const currency=qs('#expenseCurrency').value,isBase=currency===(data.baseCurrency||'MYR');qs('#expenseFxRate').value=isBase?'1':String(data.fxRates?.[currency]??qs('#expenseFxRate').value??'');qs('#expenseRateWrap').classList.toggle('hidden',false);qs('#expenseRmWrap').classList.toggle('hidden',false);qs('#expenseFxRate').readOnly=isBase;}
-function updateExpenseEquivalent(){const amount=Number(qs('#expenseAmount').value),rate=Number(qs('#expenseFxRate').value);qs('#expenseRmAmount').value=amount>0&&rate>0?(amount*rate).toFixed(2):'';}
-qs('#expenseCurrency').addEventListener('change',()=>{updateExpenseCurrencyFields();updateExpenseEquivalent()});
-qs('#expenseAmount').addEventListener('input',updateExpenseEquivalent);
-qs('#expenseFxRate').addEventListener('input',updateExpenseEquivalent);
-qs('#expenseForm').addEventListener('submit',e=>{e.preventDefault();const id=qs('#expenseEditId').value,currency=qs('#expenseCurrency').value,amount=Number(qs('#expenseAmount').value),fxRate=Number(qs('#expenseFxRate').value)||Number(data.fxRates?.[currency])||(currency===(data.baseCurrency||'MYR')?1:0),rmAmount=Number(qs('#expenseRmAmount').value);if(!(amount>0)||!(fxRate>0)||!(rmAmount>0)){toast('Set a trip exchange rate first, or enter one here');return}const expense={id:id||uid('e'),date:qs('#expenseDate').value,category:qs('#expenseCategory').value,name:qs('#expenseName').value.trim(),currency,amount,fxRate,rmAmount,baseCurrency:data.baseCurrency||'MYR'};if(!expense.name)return toast('Enter what the expense was for');if(id){const index=data.expenses.findIndex(x=>x.id===id);if(index>=0)data.expenses[index]={...data.expenses[index],...expense}}else data.expenses.push(expense);save();qs('#expenseDialog').close();toast(id?'Expense updated':'Expense saved')});
+qs('#expenseForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=qs('#expenseEditId').value,amount=Number(qs('#expenseAmount').value),base=data.baseCurrency||'MYR';
+  if(!(amount>0)){toast('Enter a valid amount');return}
+  const expense={id:id||uid('e'),date:qs('#expenseDate').value,category:qs('#expenseCategory').value,name:qs('#expenseName').value.trim(),currency:base,amount,rmAmount:amount,baseCurrency:base};
+  if(!expense.name)return toast('Enter what the expense was for');
+  if(id){const index=data.expenses.findIndex(x=>x.id===id);if(index>=0)data.expenses[index]={...data.expenses[index],...expense,fxRate:undefined}}
+  else data.expenses.push(expense);
+  save();qs('#expenseDialog').close();toast(id?'Expense updated':'Expense saved')
+});
 function addPlan(){simpleForm('Add plan',[{label:'Date',name:'date',type:'date',value:selectedTodayDate||data.trip.start,required:true},{label:'Time',name:'time',type:'time',value:''},{label:'Plan',name:'title',required:true,placeholder:'📍 Siam'},{label:'Note',name:'meta',placeholder:'Optional'}],f=>{data.plans.push({id:uid('d'),...f});save();toast('Plan saved')})}
 
 qs('#quickAdd').addEventListener('click',()=>qs('#quickDialog').showModal());
