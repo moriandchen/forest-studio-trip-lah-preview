@@ -94,6 +94,9 @@ button{touch-action:manipulation}
 .fund-balance{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f7fafc;border-radius:13px;padding:12px;font-size:11px}
 .fund-balance span{color:var(--muted);font-weight:700}
 .fund-balance b{font-size:12px;white-space:nowrap}
+.fund-member-summary{display:grid;gap:7px;margin-top:8px}
+.fund-member-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.fund-member-row span{min-width:0}.fund-member-row b{display:block;font-size:11px}.fund-member-row small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.fund-member-row strong{font-size:11px;white-space:nowrap}
 .fund-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .fund-actions .primary-btn,.fund-actions .soft-btn{margin:0;min-height:42px}
 .fund-subheading{font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--muted);margin:18px 0 9px}
