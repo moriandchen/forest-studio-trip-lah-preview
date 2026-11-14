@@ -245,6 +245,18 @@ function renderTrip(){
   else{qs('#nextTitle').textContent='No upcoming plans';qs('#nextMeta').textContent='Add your next stop when ready.'}
   renderPhaseAction();
 }
+function renderDailySpend(date){
+  const expenses=(data.expenses||[]).filter(x=>x.date===date);
+  const base=data.baseCurrency||'MYR';
+  const total=expenses.reduce((sum,x)=>sum+(Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0)),0);
+  const byCategory={};
+  expenses.forEach(x=>{const key=x.category||'Other';byCategory[key]=(byCategory[key]||0)+(Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0))});
+  const host=qs('#dailySpend');
+  if(!host)return;
+  const rows=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]);
+  host.innerHTML=`<div class="daily-spend-head"><div><span class="eyebrow">DAILY SPENDING</span><b>${moneyLabel(total,base)}</b><small>${expenses.length} personal expense${expenses.length===1?'':'s'} · Agong fund tracked separately</small></div><button type="button" class="primary-btn" id="addDailyExpenseBtn">＋ Add expense</button></div>${rows.length?`<div class="daily-spend-categories">${rows.map(([name,amount])=>`<div><span>${esc(name)}</span><b>${moneyLabel(amount,base)}</b></div>`).join('')}</div>`:'<p class="daily-spend-empty">No personal expenses recorded for this day.</p>'}`;
+  qs('#addDailyExpenseBtn').addEventListener('click',()=>openExpenseEditor());
+}
 function renderToday(){
   selectedTodayDate=effectiveTodayDate();
   const items=plansFor(selectedTodayDate), now=localISO(), nowTime=new Date().toTimeString().slice(0,5);
@@ -257,6 +269,7 @@ function renderToday(){
   qs('#todayCityDay').textContent=`${data.trip.city||'Trip'} · ${day?`Day ${day}`:'Preview'}`;
   qs('#todayDateText').textContent=parseDate(selectedTodayDate).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
   qs('#todayBadge').textContent=selectedTodayDate===now?'TODAY':selectedTodayDate>now?'UPCOMING':'PAST';
+  renderDailySpend(selectedTodayDate);
   qs('#todayHomeTitle').textContent=selectedTodayDate===now?'Today':now<data.trip.start?'First travel day':'Travel day';
   qs('#prevDayBtn').disabled=selectedTodayDate<=data.trip.start;
   qs('#nextDayBtn').disabled=selectedTodayDate>=data.trip.end;
