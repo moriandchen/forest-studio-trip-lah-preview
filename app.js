@@ -377,19 +377,19 @@ function addFundTransaction(direction){
 function renderMoney(){
   renderFundLedger();
   const spent=data.expenses.reduce((a,x)=>a+Number(x.rmAmount??x.amount??0),0),remaining=Number(data.budget||0)-spent;
-  // Stage A keeps the legacy expense ledger in MYR. Multi-currency budget conversion arrives with the Stage B ledger.
-  qs('#moneyBudget').textContent=`Budget RM ${Number(data.budget||0).toFixed(0)}`;
-  qs('#moneySpent').textContent=`Spent RM ${spent.toFixed(0)}`;
-  qs('#moneyRemaining').textContent=`RM ${remaining.toFixed(0)}`;
-  qs('#moneySmall').textContent=`RM ${remaining.toFixed(0)} left`;
+  const baseCurrency=data.baseCurrency||'MYR';
+  qs('#moneyBudget').textContent=`Budget ${moneyLabel(Number(data.budget||0),baseCurrency)}`;
+  qs('#moneySpent').textContent=`Spent ${moneyLabel(spent,baseCurrency)}`;
+  qs('#moneyRemaining').textContent=moneyLabel(remaining,baseCurrency);
+  qs('#moneySmall').textContent=`${moneyLabel(remaining,baseCurrency)} left`;
   const byCategory={},byDate={};
   data.expenses.forEach(x=>{const rm=Number(x.rmAmount??x.amount??0),category=x.category||'Other',date=x.date||data.trip.start||'';byCategory[category]=(byCategory[category]||0)+rm;if(date)byDate[date]=(byDate[date]||0)+rm});
   const categories=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]),dates=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0]));
-  qs('#expenseInsights').innerHTML=data.expenses.length?`<div class="insight-section"><div class="insight-heading">BY CATEGORY</div><div class="expense-category-grid">${categories.map(([name,total])=>`<div class="expense-category"><span>${esc(name)}</span><b>${moneyLabel(total,'MYR')}</b></div>`).join('')}</div></div><div class="insight-section"><div class="insight-heading">DAILY TOTALS</div><div class="daily-expense-list">${dates.map(([date,total])=>`<div><span>${esc(fmtDate(date,{day:'numeric',month:'short'}))}</span><b>${moneyLabel(total,'MYR')}</b></div>`).join('')}</div></div>`:'';
+  qs('#expenseInsights').innerHTML=data.expenses.length?`<div class="insight-section"><div class="insight-heading">BY CATEGORY</div><div class="expense-category-grid">${categories.map(([name,total])=>`<div class="expense-category"><span>${esc(name)}</span><b>${moneyLabel(total,baseCurrency)}</b></div>`).join('')}</div></div><div class="insight-section"><div class="insight-heading">DAILY TOTALS</div><div class="daily-expense-list">${dates.map(([date,total])=>`<div><span>${esc(fmtDate(date,{day:'numeric',month:'short'}))}</span><b>${moneyLabel(total,'MYR')}</b></div>`).join('')}</div></div>`:'';
   const categoryIcons={Food:'🍜',Transport:'🚆',Shopping:'🛍️',Accommodation:'🏨',Tickets:'🎫',Other:'🧾'};
   qs('#expenseList').innerHTML=data.expenses.slice().reverse().map(x=>{
     const currency=x.currency||'MYR',amount=Number(x.amount??0),rm=Number(x.rmAmount??x.amount??0),foreign=currency!=='MYR';
-    return `<div class="expense-item"><div class="expense-main"><span class="expense-icon">${categoryIcons[x.category||'Other']||'🧾'}</span><div class="expense-copy"><b>${esc(x.name)}</b><small>${esc(x.category||'Other')} · ${esc(fmtDate(x.date||data.trip.start,{day:'numeric',month:'short'}))}</small></div></div><div class="expense-value"><b>${moneyLabel(amount,currency)}</b>${foreign?`<small>≈ ${moneyLabel(rm,'MYR')}</small>`:''}<div class="row-actions"><button data-expense-edit="${x.id}" aria-label="Edit expense">✎</button><button class="row-delete" data-expense-delete="${x.id}" aria-label="Delete expense">×</button></div></div></div>`;
+    return `<div class="expense-item"><div class="expense-main"><span class="expense-icon">${categoryIcons[x.category||'Other']||'🧾'}</span><div class="expense-copy"><b>${esc(x.name)}</b><small>${esc(x.category||'Other')} · ${esc(fmtDate(x.date||data.trip.start,{day:'numeric',month:'short'}))}</small></div></div><div class="expense-value"><b>${moneyLabel(amount,currency)}</b>${foreign?`<small>≈ ${moneyLabel(rm,baseCurrency)}</small>`:''}<div class="row-actions"><button data-expense-edit="${x.id}" aria-label="Edit expense">✎</button><button class="row-delete" data-expense-delete="${x.id}" aria-label="Delete expense">×</button></div></div></div>`;
   }).join('');
   qs('#expenseEmpty').classList.toggle('hidden',data.expenses.length>0);
   qsa('[data-expense-edit]').forEach(b=>b.addEventListener('click',()=>openExpenseEditor(b.dataset.expenseEdit)));
