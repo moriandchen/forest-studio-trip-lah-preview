@@ -112,12 +112,11 @@
       <section id="money" class="view">
         <div class="page-head"><button class="back">←</button><div><span class="eyebrow">TRIP MONEY</span><h2>Money</h2></div><button id="editBudgetBtn" class="header-action">✎</button></div>
         <section class="fund-panel">
-          <div class="fund-heading"><div><span class="eyebrow">SHARED TRAVEL FUND</span><h3>阿公钱</h3><p>One fund ledger for this trip</p></div><span class="fund-mark">🏦</span></div>
+          <div class="fund-heading"><div><span class="eyebrow">SHARED TRAVEL FUND</span><h3>阿公钱</h3><p>One trip currency · simple records</p></div><span class="fund-mark">🏦</span></div>
           <div id="fundBalances" class="fund-balances"></div>
-          <div class="fund-subheading">MEMBER CONTRIBUTIONS · BASE CURRENCY</div>
+          <div class="fund-subheading">MEMBER CONTRIBUTIONS · TRIP CURRENCY</div>
           <div id="fundMemberSummary" class="fund-member-summary"></div>
           <div class="fund-actions"><button id="addFundContributionBtn" class="primary-btn">＋ Add money</button><button id="addFundExpenseBtn" class="soft-btn">－ Fund expense</button></div>
-          <button id="editFxRatesBtn" class="soft-btn wide">⚖ Set trip exchange rates</button>
           <div class="fund-subheading">FUND ACTIVITY</div>
           <div id="fundTransactions" class="fund-transactions"></div>
           <div id="fundEmpty" class="empty-state"><span>🏦</span><b>No fund activity yet.</b><small>Record contributions and shared expenses here.</small></div>
@@ -215,11 +214,8 @@
       </div>
       <label class="field"><span>What was it for?</span><input id="expenseName" type="text" placeholder="Lunch, BTS, souvenir…" required /></label>
       <div class="form-grid two">
-        <label class="field"><span>Currency</span><select id="expenseCurrency"><option value="THB">THB · Thai baht</option><option value="MYR">MYR · Malaysian ringgit</option><option value="SGD">SGD · Singapore dollar</option><option value="USD">USD · US dollar</option></select></label>
-        <label class="field"><span>Amount paid</span><input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="250" required /></label>
+        <label class="field"><span id="expenseAmountLabel">Amount</span><input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="250" required /></label>
       </div>
-      <label id="expenseRateWrap" class="field"><span>Exchange rate · 1 unit of selected currency = ? MYR</span><input id="expenseFxRate" type="number" min="0.000001" step="0.000001" placeholder="Enter 1 for MYR" required /><small>Enter the actual rate used by your bank or exchange counter.</small></label>
-      <label id="expenseRmWrap" class="field"><span>MYR equivalent for budget</span><input id="expenseRmAmount" type="number" min="0.01" step="0.01" readonly /><small>Calculated from amount × exchange rate.</small></label>
       <button type="submit" class="primary-btn wide">Save expense</button>
     </form>
   </dialog>
