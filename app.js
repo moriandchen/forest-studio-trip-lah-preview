@@ -354,6 +354,14 @@ function editFundTransaction(id){
     const amount=Number(form.amount);if(!(amount>0)){toast('Enter a valid amount');return}
     const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
     if(tx.direction==='out'&&amount+0.000001<refunded){toast('Amount cannot be lower than refunds already recorded');return}
+    if(tx.type==='refund'){
+      const original=(data.fundLedger.transactions||[]).find(t=>t.id===tx.refundOf&&t.direction==='out'&&t.status!=='void');
+      if(!original){toast('The original fund expense is unavailable; this refund cannot be edited');return}
+      const originalAmount=Number.isFinite(Number(original.baseAmount))?Number(original.baseAmount):Number(original.amount||0);
+      const otherRefunds=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===original.id&&t.id!==tx.id&&t.status!=='void').reduce((n,t)=>n+(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0)),0);
+      const maxRefund=Math.max(0,originalAmount-otherRefunds);
+      if(amount>maxRefund+0.000001){toast('Refund cannot exceed the remaining refundable amount');return}
+    }
     const member=members.find(m=>m.name===form.memberName);
     tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'edit',at:new Date().toISOString(),before:{title:tx.title,amount:tx.amount,currency:tx.currency,date:tx.date,memberId:tx.memberId,note:tx.note}});
     Object.assign(tx,{title:form.title.trim(),amount,currency:base,baseAmount:amount,baseCurrency:base,date:form.date,memberId:member?.id||'',note:form.note||''});
