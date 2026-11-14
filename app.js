@@ -633,36 +633,74 @@ function backupFilename(){
 }
 function exportBackup(){
   syncActiveTripSnapshot();
+  const record=activeTripRecord();
+  if(!record)return toast('No active trip to back up');
   const exportedAt=new Date().toISOString();
-  const payload={app:'Trip Lah!',backupVersion:2,exportedAt,data:{...data,lastBackup:exportedAt,version:4}};
+  const payload={app:'Trip Lah!',backupVersion:3,backupScope:'trip',exportedAt,tripId:record.id,trip:clone(record)};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=backupFilename();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  data.lastBackup=exportedAt;localStorage.setItem(LS,JSON.stringify(data));render();toast('Trip backup downloaded');
+  data.lastBackup=exportedAt;localStorage.setItem(LS,JSON.stringify(data));render();toast('Current trip backup downloaded');
 }
 function saveRecoverySnapshot(){
-  try{localStorage.setItem(RECOVERY_LS,JSON.stringify({savedAt:new Date().toISOString(),data}))}catch{}
+  try{
+    localStorage.setItem(RECOVERY_LS,JSON.stringify({savedAt:new Date().toISOString(),data:clone(data)}));
+    return true;
+  }catch{return false}
 }
 function hasRecoverySnapshot(){
   try{return !!JSON.parse(localStorage.getItem(RECOVERY_LS))?.data}catch{return false}
 }
+function activateImportedTrip(record, snapshot){
+  const trips=data.trips||[];
+  data={...clone(snapshot),version:5,trips,activeTripId:record.id,members:clone(record.members||snapshot.members||[]),currencies:clone(record.currencies||snapshot.currencies||['MYR']),baseCurrency:record.baseCurrency||snapshot.baseCurrency||'MYR'};
+  selectedTodayDate='';activePlaceFilter='All';save();showView('home');
+}
 async function importBackup(file){
   try{
-    const raw=JSON.parse(await file.text()),incoming=raw && raw.data ? raw.data : raw;
-    if(!incoming || (!incoming.trip && !Array.isArray(incoming.trips)) || (!Array.isArray(incoming.tickets) && !Array.isArray(incoming.trips))) throw new Error('Invalid backup');
-    const incomingWorkspace=normalizeData(incoming);
-    const source=incomingWorkspace.trips?.[0]?.snapshot||incomingWorkspace;
-    const match=Array.isArray(data.trips)&&data.trips.find(t=>t.start===source.trip?.start&&t.end===source.trip?.end);
-    if(match){
-      if(!confirm(`Merge this backup into existing trip “${match.name}” (${match.start} to ${match.end})?\n\nOther trips will be kept. Current data will be saved as an automatic recovery snapshot.`)) return;
-      saveRecoverySnapshot();
-      const snapshot={...clone(source),version:5,trip:{...source.trip,city:match.name,country:match.destination||source.trip?.country||'',start:match.start,end:match.end},members:clone(match.members||source.members||[]),currencies:clone(match.currencies||source.currencies||['MYR']),baseCurrency:match.baseCurrency||source.baseCurrency||'MYR'};
-      const trips=data.trips.map(t=>t.id===match.id?{...t,snapshot,budget:Number(snapshot.budget??t.budget??0)}:t);
-      data={...snapshot,trips,activeTripId:match.id,version:5};
-      selectedTodayDate='';activePlaceFilter='All';save();toast('Backup merged into existing trip');showView('home');return;
+    const raw=JSON.parse(await file.text());
+    if(raw?.app!=='Trip Lah!')throw new Error('Not a Trip Lah backup');
+
+    if(raw.backupScope==='trip'&&raw.trip?.snapshot){
+      const incomingRecord=raw.trip;
+      const incomingSnapshot=normalizeData(incomingRecord.snapshot);
+      const existing=(data.trips||[]).find(t=>t.id===incomingRecord.id)
+        ||(data.trips||[]).find(t=>t.start===incomingRecord.start&&t.end===incomingRecord.end&&t.name===incomingRecord.name&&t.destination===incomingRecord.destination);
+      const action=existing?'replace':'add';
+      const prompt=existing
+        ?`Replace only “${existing.name}” (${existing.start} to ${existing.end}) with this backup?\n\nAll other trips will remain unchanged. A recovery copy of your current workspace will be saved first.`
+        :`Add “${incomingRecord.name||'Imported trip'}” as a new trip?\n\nYour existing trips will remain unchanged. A recovery copy of your current workspace will be saved first.`;
+      if(!confirm(prompt))return;
+      if(!saveRecoverySnapshot())return toast('Could not create safety backup · import cancelled');
+      const id=existing?.id||uid('trip_');
+      const snapshot={...clone(incomingSnapshot),version:5,trip:{...incomingSnapshot.trip,city:incomingRecord.name||incomingSnapshot.trip?.city||'My Trip',country:incomingRecord.destination||incomingSnapshot.trip?.country||'',start:incomingRecord.start||incomingSnapshot.trip?.start||'',end:incomingRecord.end||incomingSnapshot.trip?.end||''},members:clone(incomingRecord.members||incomingSnapshot.members||[]),currencies:clone(incomingRecord.currencies||incomingSnapshot.currencies||['MYR']),baseCurrency:incomingRecord.baseCurrency||incomingSnapshot.baseCurrency||'MYR'};
+      const restored={...incomingRecord,id,snapshot,budget:Number(incomingRecord.budget??snapshot.budget??0),members:clone(snapshot.members||[]),currencies:clone(snapshot.currencies||['MYR'])};
+      const trips=existing?(data.trips||[]).map(t=>t.id===id?restored:t):[...(data.trips||[]),restored];
+      data={...data,trips,activeTripId:id};
+      activateImportedTrip(restored,snapshot);
+      toast(existing?'Trip backup restored':'Trip backup added');
+      return;
     }
-    if(!confirm(`Restore backup for ${incoming.trip?.city||'this trip'}?\n\nYour current Trip Lah! data will be kept as an automatic recovery snapshot.`)) return;
-    saveRecoverySnapshot();
-    data=incomingWorkspace;selectedTodayDate='';activePlaceFilter='All';save();toast('Trip backup restored');showView('home');
+
+    // Backward compatibility for older full-workspace (v2) backups.
+    const incoming=raw.data||raw;
+    if(!incoming||(!incoming.trip&&!Array.isArray(incoming.trips))||(!Array.isArray(incoming.tickets)&&!Array.isArray(incoming.trips)))throw new Error('Invalid backup');
+    const incomingWorkspace=normalizeData(incoming);
+    const sourceRecord=incomingWorkspace.trips?.find(t=>t.id===incomingWorkspace.activeTripId)||incomingWorkspace.trips?.[0];
+    const source=sourceRecord?.snapshot||incomingWorkspace;
+    const match=(data.trips||[]).find(t=>sourceRecord&&t.id===sourceRecord.id)
+      ||(data.trips||[]).find(t=>t.start===source.trip?.start&&t.end===source.trip?.end&&t.name===source.trip?.city);
+    if(match){
+      if(!confirm(`Replace only “${match.name}” with the active trip from this older backup?\n\nOther trips will be kept. A recovery copy will be saved first.`))return;
+      if(!saveRecoverySnapshot())return toast('Could not create safety backup · import cancelled');
+      const snapshot={...clone(source),version:5,trip:{...source.trip,city:match.name,country:match.destination||source.trip?.country||'',start:match.start,end:match.end},members:clone(match.members||source.members||[]),currencies:clone(match.currencies||source.currencies||['MYR']),baseCurrency:match.baseCurrency||source.baseCurrency||'MYR'};
+      const restored={...match,snapshot,budget:Number(snapshot.budget??match.budget??0)};
+      const trips=(data.trips||[]).map(t=>t.id===match.id?restored:t);
+      data={...data,trips,activeTripId:match.id};
+      activateImportedTrip(restored,snapshot);toast('Active trip restored from older backup');return;
+    }
+    if(!confirm('This is an older full-workspace backup and no matching trip was found. Replace the whole workspace?\n\nA recovery copy will be saved first.'))return;
+    if(!saveRecoverySnapshot())return toast('Could not create safety backup · import cancelled');
+    data=incomingWorkspace;selectedTodayDate='';activePlaceFilter='All';save();toast('Workspace backup restored');showView('home');
   }catch{toast('Could not import this backup')}
 }
 function restoreRecovery(){
