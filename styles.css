@@ -123,3 +123,16 @@ button{touch-action:manipulation}
 
 
 .fund-refund-btn{border:0;background:#eaf5ef;color:#34725f;border-radius:8px;padding:4px 9px;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
+
+/* Stage C3.1 · daily spending */
+.daily-spend-panel{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px}
+.daily-spend-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.daily-spend-head>div{min-width:0}
+.daily-spend-head b{display:block;font-size:27px;letter-spacing:-.03em;margin:5px 0}
+.daily-spend-head small{display:block;color:var(--muted);font-size:10px;line-height:1.4}
+.daily-spend-head .primary-btn{flex:0 0 auto;padding:10px 12px}
+.daily-spend-categories{display:grid;gap:6px;margin-top:14px}
+.daily-spend-categories>div{display:flex;justify-content:space-between;gap:8px;background:#f7fafc;border-radius:11px;padding:10px;font-size:11px}
+.daily-spend-categories span{color:var(--muted)}
+.daily-spend-empty{margin:14px 0 0;color:var(--muted);font-size:11px}
+@media(max-width:390px){.daily-spend-head{align-items:flex-start;flex-direction:column}.daily-spend-head .primary-btn{width:100%}}
