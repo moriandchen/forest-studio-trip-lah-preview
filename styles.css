@@ -136,3 +136,11 @@ button{touch-action:manipulation}
 .daily-spend-categories span{color:var(--muted)}
 .daily-spend-empty{margin:14px 0 0;color:var(--muted);font-size:11px}
 @media(max-width:390px){.daily-spend-head{align-items:flex-start;flex-direction:column}.daily-spend-head .primary-btn{width:100%}}
+
+/* Stage C3.2 · compact home budget */
+.home-budget-card{display:grid;grid-template-columns:1fr 1px 1fr;align-items:center;gap:14px;margin-top:14px;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:20px}
+.home-budget-item{min-width:0}
+.home-budget-item .eyebrow{display:block;font-size:9px}
+.home-budget-item b{display:block;margin-top:7px;font-size:21px;letter-spacing:-.03em;white-space:nowrap}
+.home-budget-divider{height:38px;background:var(--line)}
+@media(max-width:360px){.home-budget-card{gap:9px;padding:14px}.home-budget-item b{font-size:18px}}
