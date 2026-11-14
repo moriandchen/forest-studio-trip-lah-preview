@@ -341,20 +341,31 @@ function editFundTransaction(id){
     {label:'Description',name:'title',value:tx.title||'',required:true},
     {label:'Amount',name:'amount',type:'number',value:tx.amount,required:true},
     {label:'Currency',name:'currency',type:'select',value:tx.currency||data.baseCurrency||'MYR',options:currencies},
-    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',value:String(tx.fxRate??(tx.currency===(data.baseCurrency||'MYR')?1:'')),required:true,placeholder:'Enter 1 for base currency'},
+    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',value:String(tx.fxRate??data.fxRates?.[tx.currency]??(tx.currency===(data.baseCurrency||'MYR')?1:'')),placeholder:'Use trip default rate'},
     {label:tx.direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:currentMember?.name||memberNames[0],options:memberNames},
     {label:'Date',name:'date',type:'date',value:tx.date||localISO()},
     {label:'Note',name:'note',value:tx.note||'',placeholder:'Optional'}
   ],form=>{
-    const amount=Number(form.amount),fxRate=Number(form.fxRate);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Enter a valid exchange rate');return}
+    const amount=Number(form.amount),baseCurrency=data.baseCurrency||'MYR',fxRate=Number(form.fxRate)||Number(data.fxRates?.[form.currency])||(form.currency===baseCurrency?1:0);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Set a trip exchange rate first, or enter one here');return}
     const refunded=(data.fundLedger.transactions||[]).filter(t=>t.type==='refund'&&t.refundOf===id&&t.status!=='void').reduce((n,t)=>n+Number(t.amount||0),0);
     if(tx.direction==='out'&&amount+0.000001<refunded){toast('Amount cannot be lower than refunds already recorded');return}
     const member=members.find(m=>m.name===form.memberName);
     tx.audit=Array.isArray(tx.audit)?tx.audit:[];tx.audit.push({action:'edit',at:new Date().toISOString(),before:{title:tx.title,amount:tx.amount,currency:tx.currency,date:tx.date,memberId:tx.memberId,note:tx.note}});
-    const baseCurrency=data.baseCurrency||'MYR';Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,fxRate,baseAmount:Number((amount*fxRate).toFixed(2)),baseCurrency,date:form.date,memberId:member?.id||'',note:form.note||''});
+    Object.assign(tx,{title:form.title.trim(),amount,currency:form.currency,fxRate,baseAmount:Number((amount*fxRate).toFixed(2)),baseCurrency,date:form.date,memberId:member?.id||'',note:form.note||''});
     save();toast('Fund transaction updated · edit recorded');
   });
 }
+function editTripFxRates(){
+  const base=data.baseCurrency||'MYR',codes=[...new Set((data.currencies||['MYR','THB','SGD','USD']).filter(c=>c!==base))];
+  if(!codes.length)return toast('No foreign currencies configured for this trip');
+  simpleForm('Trip exchange rates · 1 foreign currency = ? '+base,codes.map(code=>({label:`1 ${code} = ? ${base}`,name:code,type:'number',value:String(data.fxRates?.[code]??''),placeholder:'Enter your usual trip rate'})),f=>{
+    data.fxRates=data.fxRates||{};
+    codes.forEach(code=>{const rate=Number(f[code]);if(rate>0)data.fxRates[code]=rate;else delete data.fxRates[code]});
+    save();toast('Trip exchange rates saved');
+  });
+}
+qs('#editFxRatesBtn')?.addEventListener('click',editTripFxRates);
+
 function addFundTransaction(direction){
   const members=(data.members||[]).map(m=>m.name);
   if(!members.length)return toast('Add a traveller first');
@@ -363,13 +374,13 @@ function addFundTransaction(direction){
     {label:'Description',name:'title',required:true,placeholder:direction==='in'?'Trip fund contribution':'Dinner / transport'},
     {label:'Amount',name:'amount',type:'number',required:true,placeholder:'100'},
     {label:'Currency',name:'currency',type:'select',value:defaultCurrency,options:[...new Set([defaultCurrency,...(data.currencies||[])])]},
-    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',required:true,placeholder:'Enter 1 for base currency'},
+    {label:`Exchange rate · 1 unit of selected currency = ? ${data.baseCurrency||'MYR'}`,name:'fxRate',type:'number',placeholder:'Use trip default rate'},
     {label:direction==='in'?'Contributed by':'Recorded for',name:'memberName',type:'select',value:members[0],options:members},
     {label:'Date',name:'date',type:'date',value:localISO()},
     {label:'Note',name:'note',placeholder:'Optional'}
   ],f=>{
-    const amount=Number(f.amount),fxRate=Number(f.fxRate);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Enter a valid exchange rate');return}
-    const member=(data.members||[]).find(m=>m.name===f.memberName),baseCurrency=data.baseCurrency||'MYR';
+    const amount=Number(f.amount),baseCurrency=data.baseCurrency||'MYR',fxRate=Number(f.fxRate)||Number(data.fxRates?.[f.currency])||(f.currency===baseCurrency?1:0);if(!(amount>0)){toast('Enter a valid amount');return}if(!(fxRate>0)){toast('Set a trip exchange rate first, or enter one here');return}
+    const member=(data.members||[]).find(m=>m.name===f.memberName);
     data.fundLedger.transactions.push({id:uid('fund_'),direction,type:direction==='in'?'contribution':'expense',title:f.title.trim(),amount,currency:f.currency,fxRate,baseAmount:Number((amount*fxRate).toFixed(2)),baseCurrency,date:f.date,memberId:member?.id||'',note:f.note||'',createdAt:new Date().toISOString()});
     save();toast(direction==='in'?'Contribution recorded':'Fund expense recorded');
   });
@@ -564,15 +575,15 @@ qs('#resetGoHomeBtn').addEventListener('click',()=>{data.gohome.forEach(x=>x.don
 function addPlace(){simpleForm('Add place',[{label:'Place',name:'name',required:true,placeholder:'Siam Paragon'},{label:'Category',name:'category',type:'select',value:'All',options:['All','Must go','Food','Shopping']},{label:'Note',name:'note',placeholder:'Optional'}],f=>{data.places.unshift({id:uid('l'),icon:'📍',name:f.name,category:f.category,note:f.note});save();toast('Place saved')})}
 function openExpenseEditor(id=''){
   const x=data.expenses.find(item=>item.id===id)||{id:'',name:'',category:'Food',date:selectedTodayDate||((localISO()>=data.trip.start&&localISO()<=data.trip.end)?localISO():data.trip.start),currency:'THB',amount:'',rmAmount:''};
-  const currency=x.currency||'MYR',legacyRate=Number(x.amount)>0&&Number(x.rmAmount)>0?Number(x.rmAmount)/Number(x.amount):1;
-  qs('#expenseDialogTitle').textContent=id?'Edit travel expense':'Add travel expense';qs('#expenseEditId').value=x.id||'';qs('#expenseDate').value=x.date||data.trip.start;qs('#expenseCategory').value=['Food','Transport','Shopping','Accommodation','Tickets','Other'].includes(x.category)?x.category:'Other';qs('#expenseName').value=x.name||'';qs('#expenseCurrency').value=['THB','MYR','SGD','USD'].includes(currency)?currency:'MYR';qs('#expenseAmount').value=x.amount??'';qs('#expenseFxRate').value=String(x.fxRate??(currency==='MYR'?1:legacyRate));updateExpenseCurrencyFields();updateExpenseEquivalent();qs('#expenseDialog').showModal();
+  const currency=x.currency||'MYR',legacyRate=Number(x.amount)>0&&Number(x.rmAmount)>0?Number(x.rmAmount)/Number(x.amount):Number(data.fxRates?.[currency])||1;
+  qs('#expenseDialogTitle').textContent=id?'Edit travel expense':'Add travel expense';qs('#expenseEditId').value=x.id||'';qs('#expenseDate').value=x.date||data.trip.start;qs('#expenseCategory').value=['Food','Transport','Shopping','Accommodation','Tickets','Other'].includes(x.category)?x.category:'Other';qs('#expenseName').value=x.name||'';qs('#expenseCurrency').value=['THB','MYR','SGD','USD'].includes(currency)?currency:'MYR';qs('#expenseAmount').value=x.amount??'';qs('#expenseFxRate').value=String(x.fxRate??data.fxRates?.[currency]??(currency===(data.baseCurrency||'MYR')?1:legacyRate));updateExpenseCurrencyFields();updateExpenseEquivalent();qs('#expenseDialog').showModal();
 }
-function updateExpenseCurrencyFields(){const isMyr=qs('#expenseCurrency').value==='MYR';qs('#expenseFxRate').value=isMyr?'1':qs('#expenseFxRate').value;qs('#expenseRateWrap').classList.toggle('hidden',false);qs('#expenseRmWrap').classList.toggle('hidden',false);qs('#expenseFxRate').readOnly=isMyr;}
+function updateExpenseCurrencyFields(){const currency=qs('#expenseCurrency').value,isBase=currency===(data.baseCurrency||'MYR');qs('#expenseFxRate').value=isBase?'1':String(data.fxRates?.[currency]??qs('#expenseFxRate').value??'');qs('#expenseRateWrap').classList.toggle('hidden',false);qs('#expenseRmWrap').classList.toggle('hidden',false);qs('#expenseFxRate').readOnly=isBase;}
 function updateExpenseEquivalent(){const amount=Number(qs('#expenseAmount').value),rate=Number(qs('#expenseFxRate').value);qs('#expenseRmAmount').value=amount>0&&rate>0?(amount*rate).toFixed(2):'';}
 qs('#expenseCurrency').addEventListener('change',()=>{updateExpenseCurrencyFields();updateExpenseEquivalent()});
 qs('#expenseAmount').addEventListener('input',updateExpenseEquivalent);
 qs('#expenseFxRate').addEventListener('input',updateExpenseEquivalent);
-qs('#expenseForm').addEventListener('submit',e=>{e.preventDefault();const id=qs('#expenseEditId').value,currency=qs('#expenseCurrency').value,amount=Number(qs('#expenseAmount').value),fxRate=Number(qs('#expenseFxRate').value),rmAmount=Number(qs('#expenseRmAmount').value);if(!(amount>0)||!(fxRate>0)||!(rmAmount>0)){toast('Enter valid amount and exchange rate');return}const expense={id:id||uid('e'),date:qs('#expenseDate').value,category:qs('#expenseCategory').value,name:qs('#expenseName').value.trim(),currency,amount,fxRate,rmAmount,baseCurrency:data.baseCurrency||'MYR'};if(!expense.name)return toast('Enter what the expense was for');if(id){const index=data.expenses.findIndex(x=>x.id===id);if(index>=0)data.expenses[index]={...data.expenses[index],...expense}}else data.expenses.push(expense);save();qs('#expenseDialog').close();toast(id?'Expense updated':'Expense saved')});
+qs('#expenseForm').addEventListener('submit',e=>{e.preventDefault();const id=qs('#expenseEditId').value,currency=qs('#expenseCurrency').value,amount=Number(qs('#expenseAmount').value),fxRate=Number(qs('#expenseFxRate').value)||Number(data.fxRates?.[currency])||(currency===(data.baseCurrency||'MYR')?1:0),rmAmount=Number(qs('#expenseRmAmount').value);if(!(amount>0)||!(fxRate>0)||!(rmAmount>0)){toast('Set a trip exchange rate first, or enter one here');return}const expense={id:id||uid('e'),date:qs('#expenseDate').value,category:qs('#expenseCategory').value,name:qs('#expenseName').value.trim(),currency,amount,fxRate,rmAmount,baseCurrency:data.baseCurrency||'MYR'};if(!expense.name)return toast('Enter what the expense was for');if(id){const index=data.expenses.findIndex(x=>x.id===id);if(index>=0)data.expenses[index]={...data.expenses[index],...expense}}else data.expenses.push(expense);save();qs('#expenseDialog').close();toast(id?'Expense updated':'Expense saved')});
 function addPlan(){simpleForm('Add plan',[{label:'Date',name:'date',type:'date',value:selectedTodayDate||data.trip.start,required:true},{label:'Time',name:'time',type:'time',value:''},{label:'Plan',name:'title',required:true,placeholder:'📍 Siam'},{label:'Note',name:'meta',placeholder:'Optional'}],f=>{data.plans.push({id:uid('d'),...f});save();toast('Plan saved')})}
 
 qs('#quickAdd').addEventListener('click',()=>qs('#quickDialog').showModal());
