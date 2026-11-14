@@ -294,11 +294,11 @@ function renderFundLedger(){
   const memberHost=qs('#fundMemberSummary');
   if(memberHost)memberHost.innerHTML=contributionRows.length?contributionRows.map(m=>`<div class="fund-member-row"><span><b>${esc(m.name)}</b><small>${m.count} contribution(s)</small></span><strong>${moneyLabel(m.total,base)}</strong></div>`).join(''):'<small>No contributions recorded yet.</small>';
   const list=data.fundLedger.transactions.slice().reverse();
-  qs('#fundTransactions').innerHTML=list.map(t=>{const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${t.type==='refund'?'↩':t.direction==='in'?'＋':'－'} ${esc(t.title|| (t.type==='refund'?'Fund refund':t.direction==='in'?'Contribution':'Fund expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}${t.note?' · '+esc(t.note):''}${voided&&t.voidReason?' · Void: '+esc(t.voidReason):''}</small></div><div class="fund-transaction-side"><strong class="${t.direction==='in'?'fund-in':'fund-out'}">${t.direction==='in'?'+':'−'}${moneyLabel(t.amount,t.currency)}</strong>${voided?`<button type="button" class="fund-edit-btn" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" class="fund-edit-btn" data-fund-edit="${esc(t.id)}">Edit</button>${t.direction==='out'&&t.type!=='refund'?`<button type="button" class="fund-refund-btn" data-fund-refund="${esc(t.id)}">Refund</button>`:''}<button type="button" class="fund-void-btn" data-fund-void="${esc(t.id)}">Void</button>`}</div></div>`}).join('');
-  qs('#fundTransactions').querySelectorAll('[data-fund-edit]').forEach(btn=>btn.addEventListener('click',()=>editFundTransaction(btn.dataset.fundEdit)));
-  qs('#fundTransactions').querySelectorAll('[data-fund-void]').forEach(btn=>btn.addEventListener('click',()=>voidFundTransaction(btn.dataset.fundVoid)));
-  qs('#fundTransactions').querySelectorAll('[data-fund-refund]').forEach(btn=>btn.addEventListener('click',()=>refundFundTransaction(btn.dataset.fundRefund)));
-  qs('#fundTransactions').querySelectorAll('[data-fund-restore]').forEach(btn=>btn.addEventListener('click',()=>restoreFundTransaction(btn.dataset.fundRestore)));
+  qs('#fundTransactions').innerHTML=list.map(t=>{
+    const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';
+    const incoming=t.direction==='in';
+    return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${incoming?'＋':'－'} ${esc(t.title||(incoming?'Agong contribution':'Agong expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}</small></div><div class="fund-transaction-side"><strong class="${incoming?'fund-in':'fund-out'}">${incoming?'+':'−'}${moneyLabel(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0),base)}</strong></div></div>`;
+  }).join('');
   qs('#fundEmpty').classList.toggle('hidden',list.length>0);
 }
 function refundFundTransaction(id){
