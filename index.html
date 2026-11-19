@@ -138,9 +138,11 @@
       </section>
 
       <section id="tickets" class="view">
-        <div class="page-head"><button class="back">←</button><div><span class="eyebrow">WALLET</span><h2>Tickets</h2></div><button id="addTicketBtn" class="header-action">＋</button></div>
-        <div id="ticketsList" class="stack-cards"></div>
-        <div id="ticketsEmpty" class="empty-state hidden"><span>🎫</span><b>No tickets yet.</b><small>Add flights, events or transport tickets here.</small></div>
+        <div class="lists-topbar"><button class="back lists-back" aria-label="Back to home">←</button><div class="lists-brand">曼谷之旅 <span>✿</span></div><button id="addTicketBtn" class="lists-edit" type="button" aria-label="Add ticket">＋</button></div>
+        <div class="lists-heading"><div><span class="eyebrow">KEEP THE GOOD MOMENTS CLOSE</span><h2>票券收藏</h2><p>機票、演唱會與旅途憑證都放在這裡。</p></div><div class="ticket-stamp">🎫<small>MY WALLET</small></div></div>
+        <div class="ticket-wallet-summary"><div><span>已收藏票券</span><b><strong id="ticketCount">0</strong> 張</b></div><span class="ticket-wallet-mark">✈ BANGKOK TRIP</span></div>
+        <div id="ticketsList" class="stack-cards lists-ticket-list"></div>
+        <div id="ticketsEmpty" class="empty-state hidden"><span>🎫</span><b>還沒有收藏票券。</b><small>把機票、活動票或交通憑證收進來吧。</small></div>
       </section>
 
       <section id="stay" class="view">
