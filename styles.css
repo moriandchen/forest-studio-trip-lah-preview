@@ -547,3 +547,8 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 .more-maintenance small{font-size:10px;color:#8b8177}
 .more-maintenance button{width:38px;height:38px;border:1px solid #e2d6c7;border-radius:12px;background:#fff;color:#9c7b70;font-size:21px}
 .more-page .version-note{padding:20px 0 5px}
+
+
+/* Permanent trip removal · A30 */
+.trip-card-actions .trip-delete-btn{border:1px solid #edc9c4;background:#fff4f1;color:#a65f56;border-radius:12px;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
+.trip-card-actions .trip-delete-btn:active{transform:translateY(1px)}
