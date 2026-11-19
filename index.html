@@ -159,9 +159,11 @@
       </section>
 
       <section id="places" class="view">
-        <div class="page-head"><button class="back">←</button><div><span class="eyebrow">SAVED</span><h2>Places</h2></div><button id="addPlaceBtn" class="header-action">＋</button></div>
-        <div id="placeFilters" class="filter-row"><button class="chip active" data-filter="All">All</button><button class="chip" data-filter="Must go">Must go</button><button class="chip" data-filter="Food">Food</button><button class="chip" data-filter="Shopping">Shopping</button></div>
-        <div id="placesList" class="place-list"></div>
+        <div class="lists-topbar"><button class="back lists-back" aria-label="Back to home">←</button><div class="lists-brand">曼谷之旅 <span>✿</span></div><button id="addPlaceBtn" class="lists-edit" type="button" aria-label="Add place">＋</button></div>
+        <div class="lists-heading"><div><span class="eyebrow">LITTLE DISCOVERIES</span><h2>想去的地方</h2><p>把想逛、想吃、想看的都收藏起來。</p></div><div class="places-stamp">📍<small>EXPLORE</small></div></div>
+        <div class="places-countline"><b>我的口袋清單</b><span id="placesCount">0 PLACES</span></div>
+        <div id="placeFilters" class="filter-row places-filter-row"><button class="chip active" data-filter="All">全部</button><button class="chip" data-filter="Must go">必去</button><button class="chip" data-filter="Food">美食</button><button class="chip" data-filter="Shopping">購物</button></div>
+        <div id="placesList" class="place-list lists-place-list"></div>
       </section>
 
       <section id="packing" class="view">
