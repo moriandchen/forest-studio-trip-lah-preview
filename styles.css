@@ -477,3 +477,45 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 .lists-ticket-side span{font-size:8px;line-height:1.35;letter-spacing:.08em}
 .lists-ticket-side>b{font-size:25px}.lists-ticket-side small{font-size:8px;writing-mode:vertical-rl;letter-spacing:.12em}
 @media(max-width:430px){.lists-ticket-card{grid-template-columns:minmax(0,1fr) 42px}.lists-ticket-main{padding:12px 11px 10px}.lists-ticket-perforation{margin-left:-11px;margin-right:-11px}}
+
+
+/* Money journal refresh · A28 */
+.money-page{padding-bottom:34px}
+.money-heading{margin-bottom:18px}
+.money-stamp{width:76px;height:76px;flex:0 0 76px;border:2px dashed #d8ad68;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#b98239;font-family:Georgia,serif;font-size:31px;transform:rotate(7deg);background:#fff8e9}
+.money-stamp small{font:700 8px/1.25 inherit;letter-spacing:1px;text-align:center}
+.money-budget-card{position:relative;overflow:hidden;margin:0 0 18px;padding:20px 19px 17px;border:2px solid #3e3a39;border-radius:22px;background:#f6d27a;color:#3e3a39;box-shadow:3px 4px 0 #3e3a39}
+.money-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;font-size:10px;font-weight:900;letter-spacing:1.3px}
+.money-currency-mark{padding:5px 9px;border:1px solid #3e3a39;border-radius:20px;font-size:9px;letter-spacing:1px}
+.money-budget-card>small{display:block;font-size:12px;font-weight:700}
+.money-budget-card>strong{display:block;margin:2px 0 13px;font-size:34px;line-height:1.2;letter-spacing:-1px}
+.money-budget-track{height:9px;border:1.5px solid #3e3a39;border-radius:20px;background:#fff9e9;overflow:hidden}
+.money-budget-track span{display:block;width:0;height:100%;background:#e98f80;border-radius:20px}
+.money-budget-meta{display:flex;justify-content:space-between;gap:10px;margin-top:9px;font-size:11px;font-weight:800}
+.money-fund-panel{margin:0 0 25px;padding:19px 16px;border:2px solid #3e3a39;border-radius:22px;background:#fffaf1;box-shadow:3px 4px 0 #3e3a39}
+.money-fund-panel .fund-heading h3{font-size:23px}
+.money-fund-panel .fund-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#b9daa5;font-size:25px}
+.money-fund-panel .fund-subheading{margin:18px 0 9px;font-size:9px;letter-spacing:1px;font-weight:900;color:#8d7868}
+.money-fund-panel .fund-balance{padding:14px;border:1.5px dashed #9caa84;border-radius:15px;background:#f0f5e9}
+.money-fund-panel .fund-balance span,.money-fund-panel .fund-member-row small{color:#786f62}
+.money-fund-panel .fund-balance b{font-size:24px}
+.money-fund-panel .fund-member-row{padding:9px 2px;border-bottom:1px dashed #e6dccd}
+.money-fund-panel .fund-actions{display:flex;gap:9px;margin-top:14px}
+.money-fund-panel .fund-actions button{flex:1;min-width:0;padding:11px 8px;border:1.5px solid #3e3a39;border-radius:13px;font-size:12px;font-weight:800}
+.money-fund-panel .fund-actions .primary-btn{background:#b9daa5;color:#3e3a39}
+.money-fund-panel .fund-actions .soft-btn{background:#f8dfd7;color:#3e3a39}
+.money-fund-panel .fund-transaction{padding:11px 2px;border-bottom:1px dashed #e6dccd}
+.money-section-heading{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 12px}
+.money-section-heading h3{margin:3px 0 0;font-size:22px}
+.money-section-heading>span{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#a8d3e6;font-size:22px}
+.money-page .expense-insights{display:grid;gap:10px;margin-bottom:13px}
+.money-page .insight-section{padding:14px;border:1.5px solid #3e3a39;border-radius:17px;background:#fff}
+.money-page .insight-heading{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#8d7868}
+.money-page .expense-category{padding:9px 0;border-bottom:1px dashed #e8dfd5}
+.money-page .daily-expense-list>div{padding:8px 0;border-bottom:1px dashed #e8dfd5}
+.money-add-expense{margin:3px 0 14px;border:2px solid #3e3a39!important;border-radius:15px!important;background:#f2a497!important;color:#3e3a39!important;box-shadow:2px 3px 0 #3e3a39;font-weight:900}
+.money-page .expense-item{padding:13px 12px;border:1.5px solid #e4d8c9;border-radius:16px;background:#fff;margin-bottom:9px}
+.money-page .expense-icon{width:39px;height:39px;border-radius:13px;background:#f6eadb}
+.money-page .expense-value> b{font-size:14px}
+.money-page .row-actions button{width:29px;height:29px;border:1px solid #e5d9ca;border-radius:9px;background:#fffaf4}
+.money-page .empty-state{padding:22px 14px;border:1.5px dashed #d8cbbb;border-radius:17px;background:#fffaf4}
