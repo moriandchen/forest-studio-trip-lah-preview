@@ -470,7 +470,8 @@ function renderMoney(){
 function renderPlaces(){
   const list=activePlaceFilter==='All'?data.places:data.places.filter(x=>x.category===activePlaceFilter);
   qs('#placesSmall').textContent=`${data.places.length} saved`;
-  qs('#placesList').innerHTML=list.map(x=>`<div class="place-item"><div class="place-icon">${esc(x.icon||'📍')}</div><div><b>${esc(x.name)}</b><small>${esc([x.category,x.note].filter(Boolean).join(' · '))}</small></div><div class="row-actions"><button data-place-map="${x.id}" title="Open maps">↗</button><button class="row-delete" data-place-delete="${x.id}" title="Delete">×</button></div></div>`).join('');
+  const count=qs('#placesCount');if(count)count.textContent=`${data.places.length} PLACES`;
+  qs('#placesList').innerHTML=list.map(x=>`<article class="lists-place-card"><div class="lists-place-icon">${esc(x.icon||'📍')}</div><div class="lists-place-content"><div class="lists-place-top"><span class="lists-place-category">${esc(x.category||'Saved')}</span><span class="lists-place-pin">✿</span></div><b>${esc(x.name)}</b>${x.note?`<small>${esc(x.note)}</small>`:''}</div><div class="lists-place-actions"><button data-place-map="${x.id}" aria-label="Open map" title="Open maps">↗</button><button data-place-delete="${x.id}" aria-label="Delete place" title="Delete">×</button></div></article>`).join('');
   qsa('[data-place-map]').forEach(b=>b.addEventListener('click',()=>{const p=data.places.find(x=>x.id===b.dataset.placeMap);if(p)openMaps(p.name)}));
   qsa('[data-place-delete]').forEach(b=>b.addEventListener('click',()=>{data.places=data.places.filter(x=>x.id!==b.dataset.placeDelete);save();toast('Place removed')}));
 }
