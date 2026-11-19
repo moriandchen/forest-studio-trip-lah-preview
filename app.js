@@ -533,6 +533,7 @@ function renderTripManager(){
         <button type="button" class="soft-btn" data-trip-members="${esc(t.id)}">Members</button>
         <button type="button" class="soft-btn" data-trip-currencies="${esc(t.id)}">Currencies</button>
         <button type="button" class="mini-link" data-trip-archive="${esc(t.id)}">${t.status==='archived'?'Restore':'Archive'}</button>
+        <button type="button" class="trip-delete-btn" data-trip-delete="${esc(t.id)}">Delete</button>
       </div>
     </article>`;
   }).join('');
@@ -541,6 +542,26 @@ function renderTripManager(){
   host.querySelectorAll('[data-trip-members]').forEach(b=>b.addEventListener('click',()=>manageMembers(b.dataset.tripMembers)));
   host.querySelectorAll('[data-trip-currencies]').forEach(b=>b.addEventListener('click',()=>manageCurrencies(b.dataset.tripCurrencies)));
   host.querySelectorAll('[data-trip-archive]').forEach(b=>b.addEventListener('click',()=>toggleTripArchive(b.dataset.tripArchive)));
+  host.querySelectorAll('[data-trip-delete]').forEach(b=>b.addEventListener('click',()=>deleteTrip(b.dataset.tripDelete)));
+}
+function deleteTrip(id){
+  const trip=(data.trips||[]).find(t=>t.id===id);if(!trip)return;
+  if((data.trips||[]).length<=1)return toast('Keep at least one trip in your workspace');
+  const label=trip.name||trip.destination||'this trip';
+  if(!confirm(`Permanently delete “${label}”? All its itinerary, members, tickets, stay details, expenses and fund records will be deleted.`))return;
+  if(!confirm(`Final check: delete “${label}” forever? This cannot be undone. If cloud sync is enabled, this deletion will sync too.`))return;
+  const wasActive=id===data.activeTripId;
+  syncActiveTripSnapshot();
+  data.trips=data.trips.filter(t=>t.id!==id);
+  if(wasActive){
+    const next=data.trips.slice().sort((a,b)=>(a.status==='archived')-(b.status==='archived')||String(b.start).localeCompare(String(a.start)))[0];
+    data.activeTripId=next.id;
+    switchTrip(next.id);
+    showView('trips');renderTripManager();
+  }else{
+    save();renderTripManager();
+  }
+  toast(`“${label}” deleted`);
 }
 function openTrips(){renderTripManager();showView('trips')}
 function switchTrip(id){
