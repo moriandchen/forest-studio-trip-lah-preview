@@ -176,23 +176,34 @@
         <div id="packingList" class="check-list lists-check-list"></div><div class="packing-footnote">準備好一樣，就替自己打個勾 ✓</div>
       </section>
 
-      <section id="money" class="view">
-        <div class="page-head"><button class="back">←</button><div><span class="eyebrow">TRIP MONEY</span><h2>Money</h2></div><button id="editBudgetBtn" class="header-action">✎</button></div>
-        <section class="fund-panel">
-          <div class="fund-heading"><div><span class="eyebrow">SHARED TRAVEL FUND</span><h3>阿公钱</h3><p>One trip currency · simple records</p></div><span class="fund-mark">🏦</span></div>
+      <section id="money" class="view money-page">
+        <div class="lists-topbar"><button class="back lists-back" aria-label="Back">←</button><div class="lists-brand">曼谷之旅 <span>✿</span></div><button id="editBudgetBtn" class="lists-edit" aria-label="Edit budget">✎</button></div>
+        <div class="lists-heading money-heading"><div><span class="eyebrow">A LITTLE TRIP ACCOUNT BOOK</span><h2>旅費小帳本</h2><p>把旅途中的每一筆，好好收藏起來。</p></div><div class="money-stamp">฿<small>MONEY<br>NOTES</small></div></div>
+
+        <article class="money-hero money-budget-card">
+          <div class="money-card-top"><span>✿ TRIP BUDGET</span><span class="money-currency-mark">MY TRIP</span></div>
+          <small>目前剩餘預算</small>
+          <strong id="moneyRemaining">RM 2,158</strong>
+          <div class="money-budget-track"><span></span></div>
+          <div class="money-budget-meta"><span id="moneyBudget">Budget RM 3,000</span><span id="moneySpent">Spent RM 842</span></div>
+        </article>
+
+        <section class="fund-panel money-fund-panel">
+          <div class="fund-heading"><div><span class="eyebrow">OUR LITTLE TREASURE CHEST</span><h3>阿公钱</h3><p>大家一起準備的旅途基金</p></div><span class="fund-mark">🏦</span></div>
           <div id="fundBalances" class="fund-balances"></div>
           <div class="fund-subheading">MEMBER CONTRIBUTIONS · TRIP CURRENCY</div>
           <div id="fundMemberSummary" class="fund-member-summary"></div>
-          <div class="fund-actions"><button id="addFundContributionBtn" class="primary-btn">＋ Add money</button><button id="addFundExpenseBtn" class="soft-btn">－ Fund expense</button></div>
-          <div class="fund-subheading">FUND ACTIVITY</div>
+          <div class="fund-actions"><button id="addFundContributionBtn" class="primary-btn">＋ 存入基金</button><button id="addFundExpenseBtn" class="soft-btn">－ 記錄支出</button></div>
+          <div class="fund-subheading">FUND ACTIVITY · 基金流水</div>
           <div id="fundTransactions" class="fund-transactions"></div>
-          <div id="fundEmpty" class="empty-state"><span>🏦</span><b>No fund activity yet.</b><small>Record contributions and shared expenses here.</small></div>
+          <div id="fundEmpty" class="empty-state"><span>🏦</span><b>還沒有基金紀錄。</b><small>把大家的旅費和共同支出記在這裡吧。</small></div>
         </section>
-        <article class="money-hero"><small>Remaining</small><strong id="moneyRemaining">RM 2,158</strong><div><span id="moneyBudget">Budget RM 3,000</span><span id="moneySpent">Spent RM 842</span></div></article>
+
+        <div class="money-section-heading"><div><span class="eyebrow">LITTLE EXPENSES, BIG MEMORIES</span><h3>旅途花費</h3></div><span>🧾</span></div>
         <div id="expenseInsights" class="expense-insights"></div>
-        <button id="addExpenseBtn" class="primary-btn wide">＋ Add travel expense</button>
+        <button id="addExpenseBtn" class="primary-btn wide money-add-expense">＋ 新增一筆旅費</button>
         <div id="expenseList" class="expense-list"></div>
-        <div id="expenseEmpty" class="empty-state hidden"><span>💸</span><b>No expenses recorded yet.</b><small>Add a travel expense to start your trip ledger.</small></div>
+        <div id="expenseEmpty" class="empty-state hidden"><span>💸</span><b>還沒有旅費紀錄。</b><small>從第一筆旅途花費開始記錄吧。</small></div>
       </section>
 
       <section id="more" class="view">
