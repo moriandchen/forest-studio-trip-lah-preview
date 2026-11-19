@@ -221,3 +221,69 @@ body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Blink
   .countdown span{font-size:56px}
   .shortcut-grid button{min-height:90px}
 }
+
+
+/* Trip Lah! Japanese illustrated edition · Home V1 */
+@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
+:root{
+ --bg:#FFFCF6;--card:#FFFCF6;--ink:#3E3A39;--muted:#827b76;--line:#3E3A39;
+ --blue:#A8D3E6;--blue-soft:#EAF5F8;--green:#B9DAA5;--shadow:none;--radius:22px;
+}
+html{background:#FFFCF6}
+body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif}
+.app-shell{max-width:620px}
+.brand-row{font-family:"Huninn",sans-serif;font-size:22px;color:#3E3A39}
+.brand-mark{background:#A8D3E6;color:#3E3A39;border:3px solid #3E3A39;border-radius:14px}
+.muted{color:#827b76}
+.ghost-pill{background:#FFFCF6;border:3px solid #3E3A39;color:#3E3A39;box-shadow:none;font-family:inherit}
+.trip-hero{position:relative;overflow:hidden;background:#FFFCF6;border:3px solid #3E3A39;border-radius:26px;padding:18px;box-shadow:none}
+.trip-hero:after{display:none}
+.trip-hero>*{position:relative;z-index:1}
+.home-illustration{position:relative;margin:-18px -18px 16px;height:156px;overflow:hidden;background:#EAF5F8;border-bottom:3px solid #3E3A39}
+.home-illustration svg{display:block;width:100%;height:100%;object-fit:cover}
+.illustration-caption{position:absolute;right:12px;bottom:8px;background:#FFFCF6;border:2px solid #3E3A39;border-radius:999px;padding:3px 9px;font-size:9px;letter-spacing:.05em}
+.eyebrow{color:#827b76;letter-spacing:.09em;font-size:10px}
+.status-dot{color:#547b4c}
+.trip-hero h1{font-family:"Huninn",sans-serif;font-size:38px;line-height:1.1;letter-spacing:0;color:#3E3A39;margin:17px 0 7px}
+.trip-dates{color:#827b76;font-size:13px}
+.countdown{margin:18px 0 15px;gap:9px}
+.countdown span{font-family:"Huninn",sans-serif;font-size:52px;letter-spacing:0;color:#3E3A39}
+.countdown small{color:#827b76;padding-bottom:7px}
+.progress-row{font-size:11px}
+.progress-row strong{color:#3E3A39}
+.progress{height:9px;border:2px solid #3E3A39;background:#FFFCF6;border-radius:99px}
+.progress div{background:#F6D27A;border-radius:99px}
+.phase-action,.home-budget-card,.next-card,.timeline-item,.shortcut-grid button{
+ border:3px solid #3E3A39;border-radius:19px;box-shadow:none
+}
+.phase-action{background:#B9DAA5;padding:13px 15px}
+.phase-action .section-label{color:#3E3A39}
+.phase-action b,.phase-action small{color:#3E3A39}
+.soft-btn{background:#F6D27A;border:3px solid #3E3A39;color:#3E3A39;border-radius:14px;font-family:inherit}
+.home-budget-card{background:#FFFCF6;padding:14px 16px;gap:12px}
+.home-budget-item b{font-family:"Huninn",sans-serif;font-size:19px;color:#3E3A39;letter-spacing:0}
+.home-budget-divider{background:#3E3A39;width:3px}
+.next-card{background:#F2A497;color:#3E3A39;padding:15px 16px}
+.next-card .section-label,.next-main p{color:#3E3A39}
+.next-main h2{font-family:"Huninn",sans-serif;font-size:17px;color:#3E3A39}
+.circle-btn{background:#FFFCF6;color:#3E3A39;border:3px solid #3E3A39}
+.section-head h3{font-family:"Huninn",sans-serif;font-size:17px}
+.text-btn{color:#3E3A39;font-family:inherit;text-decoration:underline;text-decoration-color:#F2A497;text-decoration-thickness:3px}
+.timeline-item{background:#FFFCF6;padding:12px}
+.timeline-item .dot{background:#F2A497;border:2px solid #3E3A39;width:12px;height:12px}
+.timeline-item b,.timeline-item .time{color:#3E3A39}
+.timeline-item small{color:#827b76}
+.shortcut-grid button{background:#FFFCF6;padding:13px 11px;min-height:94px}
+.shortcut-grid button:nth-child(3n+1){background:#EAF5F8}
+.shortcut-grid button:nth-child(3n+2){background:#FFF2E9}
+.shortcut-grid button:nth-child(3n){background:#F0F6E9}
+.shortcut-grid button span{font-size:20px}
+.shortcut-grid b,.shortcut-grid small{color:#3E3A39}
+.bottom-nav{background:rgba(255,252,246,.97);border:3px solid #3E3A39;border-radius:22px;box-shadow:none}
+.bottom-nav button{color:#827b76}
+.bottom-nav button.active{color:#3E3A39}
+.quick-add{background:#F6D27A;color:#3E3A39;border:3px solid #3E3A39;box-shadow:none;font-family:"Huninn",sans-serif;border-radius:16px}
+.trips-page-heading h2,.page-head h2{font-family:"Huninn",sans-serif;color:#3E3A39}
+@media(min-width:760px){body{padding:18px}.app-shell{background:#FFFCF6;border:3px solid #3E3A39;border-radius:28px;box-shadow:none}}
+@media(max-width:430px){.home-illustration{height:136px}.trip-hero{padding:15px}.home-illustration{margin:-15px -15px 14px}.trip-hero h1{font-size:34px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
