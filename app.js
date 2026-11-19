@@ -263,22 +263,63 @@ function renderDailySpend(date){
   host.innerHTML=`<div class="daily-spend-head"><div><span class="eyebrow">DAILY SPENDING</span><b>${moneyLabel(total,base)}</b><small>${expenses.length} personal expense${expenses.length===1?'':'s'} · Agong fund tracked separately</small></div><button type="button" class="primary-btn" id="addDailyExpenseBtn">＋ Add expense</button></div>${rows.length?`<div class="daily-spend-categories">${rows.map(([name,amount])=>`<div><span>${esc(name)}</span><b>${moneyLabel(amount,base)}</b></div>`).join('')}</div>`:'<p class="daily-spend-empty">No personal expenses recorded for this day.</p>'}`;
   qs('#addDailyExpenseBtn').addEventListener('click',()=>openExpenseEditor());
 }
+function itineraryTag(plan){
+  const raw=`${plan.title||''} ${plan.meta||''}`.toLowerCase();
+  if(/flight|airport|plane|airline|บิน|เครื่องบิน/.test(raw))return {label:'飛機',color:'#A8D3E6'};
+  if(/bts|mrt|train|metro|地鐵|捷運/.test(raw))return {label:'地鐵',color:'#B9DAA5'};
+  if(/walk|步行|เดิน/.test(raw))return {label:'步行',color:'#F6D27A'};
+  if(/tuk|嘟嘟|grab|taxi|car|車|交通/.test(raw))return {label:'交通',color:'#F2A497'};
+  if(/food|dinner|lunch|breakfast|餐|吃|咖啡/.test(raw))return {label:'美食',color:'#F6D27A'};
+  if(/hotel|check-in|check in|住宿|飯店/.test(raw))return {label:'住宿',color:'#B9DAA5'};
+  if(/concert|show|演唱會|活動/.test(raw))return {label:'活動',color:'#F2A497'};
+  return {label:'行程',color:'#A8D3E6'};
+}
+function renderItinerary(items){
+  const now=localISO(), nowTime=new Date().toTimeString().slice(0,5), next=nextPlan();
+  const host=qs('#todayFull');
+  host.innerHTML=items.map((p,i)=>{
+    const isPast=p.date<now||(p.date===now&&p.time&&p.time<nowTime);
+    const isNext=next&&p.id===next.id, tag=itineraryTag(p);
+    const must=/concert|pp|must|必去|ticket/i.test(`${p.title} ${p.meta}`);
+    return `<article class="itinerary-item ${isPast?'is-past':''} ${isNext?'is-next':''}">
+      <div class="itinerary-time">${esc(p.time||'—')}</div>
+      <span class="itinerary-node" style="--node-color:${tag.color}"></span>
+      <div class="itinerary-card">
+        <div class="itinerary-card-title"><b>${esc(p.title)}</b>${must?'<span class="itinerary-must">★ 必去</span>':''}</div>
+        <div class="itinerary-card-meta"><span class="itinerary-tag" style="--tag-color:${tag.color}">${tag.label}</span><span>${esc(p.meta||'')}</span></div>
+        ${isNext?'<small class="itinerary-next-label">NEXT UP</small>':''}
+        <button class="itinerary-delete" data-plan-delete="${esc(p.id)}" aria-label="Delete plan">×</button>
+      </div>
+    </article>`;
+  }).join('');
+  qsa('#todayFull [data-plan-delete]').forEach(b=>b.addEventListener('click',()=>{data.plans=data.plans.filter(p=>p.id!==b.dataset.planDelete);save();toast('Plan removed')}));
+}
 function renderToday(){
   selectedTodayDate=effectiveTodayDate();
   const items=plansFor(selectedTodayDate), now=localISO(), nowTime=new Date().toTimeString().slice(0,5);
   let previewItems=items;
   if(selectedTodayDate===now){const upcoming=items.filter(p=>!p.time||p.time>=nowTime);previewItems=upcoming.length?upcoming:items.slice(-1);}
   renderTimeline('#todayPreview',previewItems);
-  renderTimeline('#todayFull',items);
+  renderItinerary(items);
   qs('#todayEmpty').classList.toggle('hidden',items.length>0);
   const day=tripDayFor(selectedTodayDate);
   qs('#todayCityDay').textContent=`${data.trip.city||'Trip'} · ${day?`Day ${day}`:'Preview'}`;
   qs('#todayDateText').textContent=parseDate(selectedTodayDate).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
   qs('#todayBadge').textContent=selectedTodayDate===now?'TODAY':selectedTodayDate>now?'UPCOMING':'PAST';
+  const tabs=qs('#todayDateTabs');
+  const total=Math.max(0,daysBetween(data.trip.start,data.trip.end));
+  const dates=Array.from({length:Math.min(total+1,31)},(_,i)=>addDays(data.trip.start,i));
+  tabs.innerHTML=dates.map((date,i)=>{
+    const d=parseDate(date),active=date===selectedTodayDate;
+    return `<button type="button" class="itinerary-date-tab ${active?'active':''}" data-itinerary-date="${date}" aria-pressed="${active}">
+      <span>${d.toLocaleDateString('en-GB',{day:'numeric'})}</span><small>${d.toLocaleDateString('zh-Hant',{weekday:'short'})}</small>
+    </button>`;
+  }).join('');
+  qsa('[data-itinerary-date]').forEach(b=>b.addEventListener('click',()=>{selectedTodayDate=b.dataset.itineraryDate;renderToday()}));
+  const activeTab=qs('.itinerary-date-tab.active');
+  if(activeTab)activeTab.scrollIntoView({block:'nearest',inline:'center'});
   renderDailySpend(selectedTodayDate);
   qs('#todayHomeTitle').textContent=selectedTodayDate===now?'Today':now<data.trip.start?'First travel day':'Travel day';
-  qs('#prevDayBtn').disabled=selectedTodayDate<=data.trip.start;
-  qs('#nextDayBtn').disabled=selectedTodayDate>=data.trip.end;
 }
 function renderPacking(){
   const done=data.packing.filter(x=>x.done).length,total=data.packing.length;
