@@ -323,7 +323,7 @@ function renderToday(){
 }
 function renderPacking(){
   const done=data.packing.filter(x=>x.done).length,total=data.packing.length;
-  qs('#packDone').textContent=done;qs('#packLeft').textContent=total-done;qs('#packingSmall').textContent=`${done} / ${total}`;
+  qs('#packDone').textContent=done;qs('#packLeft').textContent=total-done;qs('#packTotal').textContent=total;const bar=qs('#packProgressBar');if(bar)bar.style.width=(total?Math.round(done/total*100):0)+'%';qs('#packingSmall').textContent=`${done} / ${total}`;
   qs('#packingList').innerHTML=data.packing.map(x=>`<div class="check-item ${x.done?'checked':''}"><input type="checkbox" data-pack="${x.id}" ${x.done?'checked':''}><label>${esc(x.name)}</label><button class="row-delete" data-pack-delete="${x.id}" aria-label="Delete">×</button></div>`).join('');
   qsa('[data-pack]').forEach(c=>c.addEventListener('change',()=>{const item=data.packing.find(x=>x.id===c.dataset.pack);if(item)item.done=c.checked;save()}));
   qsa('[data-pack-delete]').forEach(b=>b.addEventListener('click',()=>{data.packing=data.packing.filter(x=>x.id!==b.dataset.packDelete);save();toast('Packing item removed')}));
