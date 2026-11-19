@@ -449,6 +449,7 @@ function addFundTransaction(direction){
 function renderMoney(){
   renderFundLedger();
   const spent=data.expenses.reduce((a,x)=>a+(Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0)),0),remaining=Number(data.budget||0)-spent;
+  const budgetProgress=Number(data.budget||0)>0?Math.max(0,Math.min(100,spent/Number(data.budget||0)*100)):0;const budgetTrack=qs('.money-budget-track span');if(budgetTrack)budgetTrack.style.width=`${budgetProgress}%`;
   const baseCurrency=data.baseCurrency||'MYR';
   qs('#moneyBudget').textContent=`Budget ${moneyLabel(Number(data.budget||0),baseCurrency)}`;
   qs('#moneySpent').textContent=`Spent ${moneyLabel(spent,baseCurrency)}`;
