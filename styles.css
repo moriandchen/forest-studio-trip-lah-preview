@@ -567,3 +567,13 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 .prepaid-cost-totals{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
 .prepaid-cost-totals span{padding:5px 9px;border-radius:999px;background:#f2f0e5;color:#5e674f;font-size:10px;font-weight:800}
 .prepaid-cost-empty{color:#8b8177;font-size:11px}
+
+
+/* Editable shared fund activity · A32 */
+.fund-transaction{gap:10px}
+.fund-transaction-main{min-width:0;flex:1}
+.fund-transaction-side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.fund-row-actions{display:flex;gap:5px}
+.fund-row-actions button{border:1px solid #e6d8c9;border-radius:8px;padding:4px 8px;background:#fffaf4;color:#806e5e;font-size:10px;font-weight:800;cursor:pointer}
+.fund-row-actions button[data-fund-void]{color:#a65f56;border-color:#edc9c4;background:#fff4f1}
+.fund-transaction.is-void .fund-row-actions button{color:#64816a;border-color:#c9ddc3;background:#f3f8ef}
