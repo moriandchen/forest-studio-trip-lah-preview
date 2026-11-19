@@ -483,7 +483,22 @@ function renderStay(){
 }
 function renderTickets(){
   qs('#ticketsSmall').textContent=`${data.tickets.length} ready`;
-  qs('#ticketsList').innerHTML=data.tickets.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(t=>`<article class="ticket-card ${t.type==='EVENT'?'featured':''}" data-ticket-card="${t.id}"><span class="ticket-type">${esc(t.type)}</span><h3>${esc(t.title)}</h3><p>${esc(fmtDate(t.date,{day:'numeric',month:'short'}))}${t.time?' · '+esc(t.time):''}${t.place?' · '+esc(t.place):''}</p><div class="ticket-bottom"><span>${t.seat?'Seat '+esc(t.seat):esc(t.code||'No reference')}</span><div class="ticket-actions"><button class="soft-btn" data-ticket-qr="${t.id}">View</button><button class="icon-btn" data-ticket-edit="${t.id}">✎</button></div></div></article>`).join('');
+  const count=qs('#ticketCount');if(count)count.textContent=data.tickets.length;
+  const labels={FLIGHT:'✈ FLIGHT',EVENT:'✿ EVENT',TRAIN:'🚆 TRAIN',BUS:'🚌 BUS',RETURN:'↩ RETURN',OTHER:'✧ OTHER'};
+  qs('#ticketsList').innerHTML=data.tickets.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(t=>{
+    const label=labels[t.type]||labels.OTHER;
+    const date=fmtDate(t.date,{day:'numeric',month:'short',year:'numeric'});
+    const detail=[t.time,t.place].filter(Boolean).map(esc).join(' · ');
+    const ref=t.seat?`Seat ${esc(t.seat)}`:esc(t.code||'No reference');
+    return `<article class="lists-ticket-card ${t.type==='EVENT'?'is-event':''}" data-ticket-card="${t.id}">
+      <div class="lists-ticket-main"><div class="lists-ticket-type">${label}</div><div class="lists-ticket-title-row"><h3>${esc(t.title)}</h3><span class="ticket-card-star">✦</span></div>
+        <div class="lists-ticket-date"><span>▣</span><b>${esc(date)}</b>${detail?`<small>${detail}</small>`:''}</div>
+        <div class="lists-ticket-perforation"><span></span><i></i><span></span></div>
+        <div class="lists-ticket-bottom"><div><small>${t.seat?'SEAT / CLASS':'REFERENCE'}</small><b>${ref}</b></div><div class="lists-ticket-actions"><button type="button" data-ticket-qr="${t.id}">VIEW</button><button type="button" data-ticket-edit="${t.id}" aria-label="Edit ticket">✎</button></div></div>
+        ${t.qr?'<span class="lists-ticket-image-mark">IMAGE SAVED ✓</span>':''}
+      </div><div class="lists-ticket-side"><span>TRIP<br>LAH!</span><b>✈</b><small>${esc(String(t.type||'OTHER'))}</small></div>
+    </article>`;
+  }).join('');
   qs('#ticketsEmpty').classList.toggle('hidden',data.tickets.length>0);
   qsa('[data-ticket-qr]').forEach(b=>b.addEventListener('click',()=>openQr(b.dataset.ticketQr)));
   qsa('[data-ticket-edit]').forEach(b=>b.addEventListener('click',()=>openTicketEditor(b.dataset.ticketEdit)));
