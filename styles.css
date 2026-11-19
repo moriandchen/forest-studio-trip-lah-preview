@@ -382,3 +382,35 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
  .itinerary-card{padding-right:31px}
 }
 @media(prefers-reduced-motion:reduce){.itinerary-tuktuk{animation:none}}
+
+/* Lists & stay · hand-drawn travel notebook page */
+#packing.view.active,#stay.view.active{display:block}
+.lists-topbar{position:sticky;top:0;z-index:8;height:60px;margin:-22px -18px 0;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#FFFCF6;border-bottom:3px solid #3E3A39}
+.lists-back,.lists-edit{width:38px;height:38px;border:3px solid #3E3A39;border-radius:50%;background:#FFFCF6;color:#3E3A39;font-size:20px;line-height:1}
+.lists-edit{border-radius:13px;background:#B9DAA5}.lists-brand{font-family:"Huninn",sans-serif;font-size:19px;color:#3E3A39}.lists-brand span{color:#F2A497}
+.lists-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 17px}.lists-heading .eyebrow{font-size:11px;letter-spacing:.08em;color:#827b76}
+.lists-heading h2{margin:5px 0 3px;font-family:"Huninn",sans-serif;font-size:27px;font-weight:400;color:#3E3A39}.lists-heading p{margin:0;font-size:13px;color:#827b76}
+.hotel-doodle{width:68px;flex:none;animation:itineraryFloat 3.2s ease-in-out infinite}.packing-bag{width:66px;height:66px;display:grid;place-items:center;border:3px solid #3E3A39;border-radius:22px;background:#F6D27A;font-size:35px;transform:rotate(5deg)}
+.packing-progress-card{padding:15px 16px;border:3px solid #3E3A39;border-radius:24px;background:#A8D3E6}.packing-progress-top,.packing-progress-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.packing-progress-top>div{display:flex;align-items:baseline;gap:12px;font-size:15px}.packing-progress-top>div b{font-size:14px}.packing-progress-top>div strong{font-family:"Huninn",sans-serif;font-size:24px}
+.packing-progress-sticker{padding:3px 8px;border:2px solid #3E3A39;border-radius:99px;background:#FFFCF6;font-size:9px;white-space:nowrap}
+.packing-progress-track{height:13px;margin:12px 0 9px;border:2px solid #3E3A39;border-radius:99px;background:#FFFCF6;overflow:hidden}.packing-progress-track span{display:block;width:0;height:100%;border-right:2px solid #3E3A39;border-radius:99px;background:#B9DAA5;transition:width .25s ease}
+.packing-progress-bottom{font-size:11px;color:#514b47}.packing-progress-bottom b{font-size:12px;color:#3E3A39}
+.lists-section-title{display:flex;align-items:baseline;justify-content:space-between;margin:23px 1px 10px}.lists-section-title h3{margin:0;font-family:"Huninn",sans-serif;font-size:20px;font-weight:400}.lists-section-title span{font-size:9px;letter-spacing:.12em;color:#827b76}
+.lists-check-list{display:flex;flex-direction:column;gap:9px}.lists-check-list .check-item{min-height:52px;padding:9px 12px;border:3px solid #3E3A39;border-radius:18px;background:#FFFCF6;display:flex;align-items:center;gap:11px;box-shadow:none}
+.lists-check-list .check-item.checked{background:#F8E8E3}.lists-check-list .check-item input{width:22px;height:22px;accent-color:#3E3A39;flex:none}.lists-check-list .check-item label{font-family:"Huninn",sans-serif;font-size:15px;color:#3E3A39}
+.lists-check-list .check-item.checked label{text-decoration:line-through;color:#827b76}.lists-check-list .row-delete{width:26px;height:26px;border:0;border-radius:50%;background:#f4eee5;color:#3E3A39;font-size:17px}
+.packing-footnote{margin:13px 3px 0;text-align:center;font-size:12px;color:#827b76}
+.lists-hotel-card{overflow:hidden;border:3px solid #3E3A39;border-radius:27px;background:#A8D3E6}
+#stay .hotel-visual{height:154px;margin:0;border:0;border-bottom:3px solid #3E3A39;border-radius:0;background:#A8D3E6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#3E3A39;font-family:"Huninn",sans-serif;font-size:57px;letter-spacing:.08em;position:relative}
+#stay .hotel-visual:before,#stay .hotel-visual:after{content:"";position:absolute;bottom:0;width:24%;height:47%;border:3px solid #3E3A39;border-bottom:0;background:#F6D27A}
+#stay .hotel-visual:before{left:0;border-left:0;border-radius:0 12px 0 0}#stay .hotel-visual:after{right:0;border-right:0;border-radius:12px 0 0 0}
+#stay .hotel-visual span,#stay .hotel-visual small{position:relative;z-index:1}#stay .hotel-visual small{font-size:10px;letter-spacing:.2em}
+.hotel-card-body{padding:16px;background:#A8D3E6}.lists-date-pill{display:inline-block;padding:3px 11px;border:2px solid #3E3A39;border-radius:99px;background:#F6D27A;font-size:12px}
+#stay .hotel-card-body h2{margin:10px 0 4px;font-family:"Huninn",sans-serif;font-size:23px;font-weight:400;color:#3E3A39}#stay .hotel-card-body>p{margin:0 0 15px;font-size:13px;color:#514b47}
+.lists-info-row{display:flex;align-items:flex-start;gap:10px;margin-top:9px;padding:10px 11px;border:2px solid #3E3A39;border-radius:15px;background:#FFFCF6}
+.lists-info-row>span{font-size:17px}.lists-info-row>div{min-width:0;display:flex;flex-direction:column;gap:3px}.lists-info-row b{font-size:12px}.lists-info-row small{font-size:12px;overflow-wrap:anywhere;color:#655e59}
+.lists-hotel-actions{display:flex;gap:8px;margin-top:14px}.lists-hotel-actions button{flex:1;min-width:0;padding:11px 8px;font-size:11px}
+.lists-hotel-note{display:flex;align-items:center;gap:11px;margin-top:14px;padding:13px;border:3px solid #3E3A39;border-radius:19px;background:#B9DAA5}.lists-hotel-note>span{font-size:24px}.lists-hotel-note div{display:flex;flex-direction:column;gap:3px}.lists-hotel-note b{font-family:"Huninn",sans-serif;font-size:14px}.lists-hotel-note small{font-size:11px;line-height:1.5}
+@media(max-width:430px){.lists-topbar{margin:-22px -18px 0}.lists-heading{margin-top:18px}.lists-hotel-actions{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.hotel-doodle{animation:none}}
