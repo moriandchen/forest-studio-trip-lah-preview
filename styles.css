@@ -324,3 +324,61 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
   .trip-hero h1{font-size:32px}
   .home-countdown-card .countdown span{font-size:48px}
 }
+
+
+/* Daily itinerary · faithful layout pass from 曼谷旅行手帖 */
+#today.view.active{display:block}
+.itinerary-topbar{
+  position:sticky;top:0;z-index:8;height:60px;margin:-22px -18px 0;padding:0 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:#FFFCF6;border-bottom:3px solid #3E3A39;
+}
+.itinerary-back,.itinerary-add{
+  width:38px;height:38px;border:3px solid #3E3A39;border-radius:50%;
+  background:#FFFCF6;font-size:20px;line-height:1;color:#3E3A39;
+}
+.itinerary-brand{font-family:"Huninn",sans-serif;font-size:19px}
+.itinerary-brand span{color:#F2A497}
+.itinerary-add{background:#F6D27A;border-radius:13px}
+.itinerary-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 15px}
+.itinerary-heading h2{margin:0;font-family:"Huninn",sans-serif;font-size:27px;font-weight:400}
+.itinerary-heading p{margin:5px 0 0;font-size:14px;color:#827b76}
+.itinerary-tuktuk{width:64px;height:52px;animation:itineraryFloat 3.2s ease-in-out infinite}
+@keyframes itineraryFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.itinerary-date-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:none}
+.itinerary-date-tabs::-webkit-scrollbar{display:none}
+.itinerary-date-tab{
+  flex:1 0 54px;min-width:54px;min-height:60px;padding:6px 3px;
+  border:3px solid #3E3A39;border-radius:17px;background:#FFFCF6;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-family:"Huninn",sans-serif;color:#3E3A39;
+}
+.itinerary-date-tab span{font-size:20px;line-height:1}
+.itinerary-date-tab small{font-size:12px}
+.itinerary-date-tab.active{background:#F6D27A}
+.itinerary-dayline{display:flex;justify-content:space-between;align-items:center;margin:7px 1px 12px;font-size:12px;color:#827b76}
+.itinerary-dayline span:last-child{padding:3px 10px;border:2px solid #3E3A39;border-radius:99px;background:#B9DAA5;color:#3E3A39;font-size:10px}
+.itinerary-timeline{position:relative;display:flex;flex-direction:column;gap:13px;padding:3px 0 16px}
+.itinerary-timeline:before{content:"";position:absolute;left:61px;top:20px;bottom:34px;width:3px;background:#3E3A39}
+.itinerary-item{position:relative;display:grid;grid-template-columns:44px 18px minmax(0,1fr);gap:10px;align-items:start}
+.itinerary-time{padding-top:12px;text-align:right;font-size:14px;font-variant-numeric:tabular-nums}
+.itinerary-node{width:18px;height:18px;margin-top:13px;border:3px solid #3E3A39;border-radius:50%;background:var(--node-color);position:relative;z-index:1}
+.itinerary-card{position:relative;min-width:0;padding:12px 35px 12px 13px;border:3px solid #3E3A39;border-radius:19px;background:#FFFCF6;display:flex;flex-direction:column;gap:8px}
+.itinerary-card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}
+.itinerary-card-title b{font-family:"Huninn",sans-serif;font-size:16px;font-weight:400;line-height:1.35;overflow-wrap:anywhere}
+.itinerary-must{flex:none;padding:1px 8px;border:2px solid #3E3A39;border-radius:99px;background:#F2A497;font-size:11px}
+.itinerary-card-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;line-height:1.45}
+.itinerary-tag{padding:1px 9px;border:2px solid #3E3A39;border-radius:99px;background:var(--tag-color);font-size:12px;white-space:nowrap}
+.itinerary-next-label{font-size:9px;letter-spacing:.12em;color:#827b76}
+.itinerary-delete{position:absolute;right:8px;top:8px;width:23px;height:23px;border:0;border-radius:50%;background:#f4eee5;color:#3E3A39;font-size:17px;line-height:1}
+.itinerary-item.is-past{opacity:.58}
+.itinerary-item.is-next .itinerary-card{background:#FFF8E8}
+#todayEmpty{margin:12px 0}
+#dailySpend{margin-top:12px}
+@media(min-width:760px){.itinerary-topbar{margin:-22px -18px 0}}
+@media(max-width:430px){
+ .itinerary-topbar{margin:-22px -18px 0}
+ .itinerary-heading{margin-top:18px}
+ .itinerary-card{padding-right:31px}
+}
+@media(prefers-reduced-motion:reduce){.itinerary-tuktuk{animation:none}}
