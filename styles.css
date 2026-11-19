@@ -224,7 +224,7 @@ body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Blink
 
 
 /* Trip Lah! Japanese illustrated edition · Home V1 */
-@import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
+
 :root{
  --bg:#FFFCF6;--card:#FFFCF6;--ink:#3E3A39;--muted:#827b76;--line:#3E3A39;
  --blue:#A8D3E6;--blue-soft:#EAF5F8;--green:#B9DAA5;--shadow:none;--radius:22px;
