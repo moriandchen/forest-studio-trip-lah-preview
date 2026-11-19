@@ -144,3 +144,80 @@ button{touch-action:manipulation}
 .home-budget-item b{display:block;margin-top:7px;font-size:21px;letter-spacing:-.03em;white-space:nowrap}
 .home-budget-divider{height:38px;background:var(--line)}
 @media(max-width:360px){.home-budget-card{gap:9px;padding:14px}.home-budget-item b{font-size:18px}}
+
+
+/* Trip Lah! Modern Travel Journal · UI refresh / Home pass */
+:root{
+  --bg:#f5f0e7;--card:#fffdf9;--ink:#25332e;--muted:#7d8982;--line:#e8e2d8;
+  --blue:#245447;--blue-soft:#e8eee8;--green:#789581;--shadow:0 10px 28px rgba(39,57,48,.07);
+  --radius:20px;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif}
+.app-shell{max-width:600px}
+.brand-row{font-size:19px;letter-spacing:-.035em}
+.brand-mark{background:#245447;color:#fff;border-radius:11px}
+.muted{color:#7d8982}
+.ghost-pill{background:#fffdf9;color:#245447;box-shadow:none;border:1px solid var(--line);font-weight:650}
+.ghost-pill:active,.soft-btn:active,.primary-btn:active{transform:translateY(1px)}
+.trip-hero{
+  position:relative;overflow:hidden;background:linear-gradient(135deg,#fffdf9 0%,#f1eadf 100%);
+  border:1px solid #e9e1d5;border-radius:24px;padding:25px 23px 22px;box-shadow:none
+}
+.trip-hero:after{
+  content:"";position:absolute;width:190px;height:190px;right:-68px;top:30px;border:1px solid rgba(36,84,71,.12);
+  border-radius:50%;box-shadow:0 0 0 18px rgba(36,84,71,.025),0 0 0 38px rgba(36,84,71,.02);pointer-events:none
+}
+.trip-hero>*{position:relative;z-index:1}
+.eyebrow{color:#8a948c;font-size:9px;letter-spacing:.13em}
+.status-dot{color:#47745e}
+.trip-hero h1{font-size:clamp(42px,11vw,56px);font-weight:750;letter-spacing:-.065em;margin:24px 0 8px;color:#214b3e}
+.trip-dates{font-size:13px;color:#77847b}
+.countdown{gap:10px;margin:25px 0 20px}
+.countdown span{font-size:60px;line-height:.95;letter-spacing:-.07em;color:#243a31}
+.countdown small{font-size:12px;padding-bottom:5px}
+.progress-row{font-size:11px;color:#7d8982}
+.progress-row strong{color:#245447}
+.progress{height:5px;background:#e3e5dc;border-radius:99px}
+.progress div{background:#789581}
+.phase-action{background:#fffdf9;border:1px solid var(--line);border-radius:17px;padding:14px 16px;box-shadow:none}
+.phase-action .section-label{color:#89958d}
+.phase-action b{font-size:13px;color:#293a32}
+.soft-btn{background:#e8eee8;color:#245447;border-radius:11px;font-weight:650}
+.home-budget-card{background:#fffdf9;border:1px solid var(--line);border-radius:17px;padding:15px 17px;box-shadow:none}
+.home-budget-item .eyebrow{font-size:9px}
+.home-budget-item b{font-size:20px;color:#253b31;letter-spacing:-.045em}
+.home-budget-divider{background:#e9e4db;height:34px}
+.next-card{background:#214b3e;border-radius:18px;padding:17px 18px;margin-top:13px;box-shadow:none}
+.next-card .section-label{color:#c2d0c5}
+.next-main h2{font-size:16px;letter-spacing:-.02em;margin:10px 0 5px}
+.next-main p{color:#d0dbd3;font-size:11px}
+.circle-btn{width:34px;height:34px;background:rgba(255,255,255,.14);color:#fff}
+.section-block{margin-top:25px}
+.section-head h3{font-size:16px;letter-spacing:-.025em}
+.text-btn{color:#376c59;font-weight:650}
+.timeline{gap:8px;margin-top:11px}
+.timeline-item{background:#fffdf9;border:1px solid var(--line);border-radius:14px;padding:12px 13px;gap:10px}
+.timeline-item .time{font-size:11px;color:#53645a}
+.timeline-item .dot{width:8px;height:8px;background:#789581}
+.timeline-item b{font-size:12px;color:#293a32}
+.timeline-item small{font-size:10px;color:#89938c}
+.shortcut-grid{gap:9px;margin-top:22px}
+.shortcut-grid button{background:#fffdf9;border:1px solid var(--line);border-radius:16px;padding:14px 12px;min-height:96px;box-shadow:none}
+.shortcut-grid button span{font-size:19px;margin-bottom:12px}
+.shortcut-grid b{font-size:12px;color:#2b3d33}
+.shortcut-grid small{font-size:10px;color:#879188}
+.bottom-nav{background:rgba(255,253,249,.96);border:1px solid #e8e2d8;border-radius:18px;box-shadow:0 8px 24px rgba(39,57,48,.09);backdrop-filter:blur(18px)}
+.bottom-nav button{color:#9ba39c}
+.bottom-nav button.active{color:#245447}
+.quick-add{background:#245447;box-shadow:0 8px 20px rgba(36,84,71,.2);border-radius:14px;padding:13px 18px}
+@media(min-width:760px){
+  body{padding:20px}
+  .app-shell{background:#fbf8f2;border:1px solid #e8e2d8;border-radius:28px;box-shadow:0 12px 36px rgba(39,57,48,.06)}
+}
+@media(max-width:430px){
+  .trip-hero{padding:22px 19px 19px}
+  .trip-hero h1{font-size:46px}
+  .countdown span{font-size:56px}
+  .shortcut-grid button{min-height:90px}
+}
