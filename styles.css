@@ -414,3 +414,29 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 .lists-hotel-note{display:flex;align-items:center;gap:11px;margin-top:14px;padding:13px;border:3px solid #3E3A39;border-radius:19px;background:#B9DAA5}.lists-hotel-note>span{font-size:24px}.lists-hotel-note div{display:flex;flex-direction:column;gap:3px}.lists-hotel-note b{font-family:"Huninn",sans-serif;font-size:14px}.lists-hotel-note small{font-size:11px;line-height:1.5}
 @media(max-width:430px){.lists-topbar{margin:-22px -18px 0}.lists-heading{margin-top:18px}.lists-hotel-actions{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.hotel-doodle{animation:none}}
+
+/* Saved places · pocket guide cards */
+#places.view.active{display:block}
+.places-stamp{width:65px;height:65px;flex:none;border:3px solid #3E3A39;border-radius:20px;background:#F2A497;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:27px;transform:rotate(4deg)}
+.places-stamp small{font-size:8px;letter-spacing:.12em}
+.places-countline{display:flex;align-items:baseline;justify-content:space-between;margin:5px 1px 9px}
+.places-countline b{font-family:"Huninn",sans-serif;font-size:18px;font-weight:400}
+.places-countline span{font-size:9px;letter-spacing:.12em;color:#827b76}
+.places-filter-row{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 9px;scrollbar-width:none}
+.places-filter-row::-webkit-scrollbar{display:none}
+.places-filter-row .chip{flex:none;padding:7px 13px;border:3px solid #3E3A39;border-radius:99px;background:#FFFCF6;color:#3E3A39;font-family:"Huninn",sans-serif;font-size:13px}
+.places-filter-row .chip.active{background:#B9DAA5}
+.lists-place-list{display:flex;flex-direction:column;gap:10px;margin-top:7px}
+.lists-place-card{display:flex;align-items:center;gap:11px;min-width:0;padding:11px;border:3px solid #3E3A39;border-radius:20px;background:#FFFCF6;box-shadow:none}
+.lists-place-icon{width:47px;height:47px;flex:none;border:2px solid #3E3A39;border-radius:15px;background:#F6D27A;display:grid;place-items:center;font-size:24px}
+.lists-place-card:nth-child(3n+2) .lists-place-icon{background:#A8D3E6}
+.lists-place-card:nth-child(3n) .lists-place-icon{background:#F2A497}
+.lists-place-content{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.lists-place-top{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.lists-place-category{font-size:9px;letter-spacing:.06em;color:#827b76}
+.lists-place-pin{font-size:11px;color:#F2A497}
+.lists-place-content>b{font-family:"Huninn",sans-serif;font-size:15px;font-weight:400;overflow-wrap:anywhere}
+.lists-place-content>small{font-size:11px;color:#827b76;overflow-wrap:anywhere}
+.lists-place-actions{display:flex;flex-direction:column;gap:5px}
+.lists-place-actions button{width:29px;height:29px;border:2px solid #3E3A39;border-radius:10px;background:#F6D27A;color:#3E3A39;font-size:16px;line-height:1}
+.lists-place-actions button+button{background:#f4eee5}
