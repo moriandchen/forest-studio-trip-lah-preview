@@ -440,3 +440,40 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 .lists-place-actions{display:flex;flex-direction:column;gap:5px}
 .lists-place-actions button{width:29px;height:29px;border:2px solid #3E3A39;border-radius:10px;background:#F6D27A;color:#3E3A39;font-size:16px;line-height:1}
 .lists-place-actions button+button{background:#f4eee5}
+
+/* Tickets wallet · keepsake ticket stubs */
+#tickets.view.active{display:block}
+.ticket-stamp{width:66px;height:66px;flex:none;border:3px solid #3E3A39;border-radius:20px;background:#F6D27A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:28px;transform:rotate(-4deg)}
+.ticket-stamp small{font-size:8px;letter-spacing:.12em}
+.ticket-wallet-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:5px 1px 13px;padding:12px 14px;border:3px solid #3E3A39;border-radius:18px;background:#B9DAA5}
+.ticket-wallet-summary>div{display:flex;align-items:baseline;gap:10px;font-family:"Huninn",sans-serif;font-size:14px}
+.ticket-wallet-summary strong{font-size:25px}.ticket-wallet-mark{font-size:9px;letter-spacing:.08em}
+.lists-ticket-list{display:flex;flex-direction:column;gap:13px}
+.lists-ticket-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 48px;overflow:hidden;border:3px solid #3E3A39;border-radius:21px;background:#A8D3E6;box-shadow:none}
+.lists-ticket-card.is-event{background:#F2A497}
+.lists-ticket-main{position:relative;min-width:0;padding:13px 13px 11px}
+.lists-ticket-type{display:inline-flex;padding:3px 9px;border:2px solid #3E3A39;border-radius:99px;background:#FFFCF6;font-size:10px;letter-spacing:.05em}
+.lists-ticket-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;margin-top:9px}
+.lists-ticket-title-row h3{margin:0;font-family:"Huninn",sans-serif;font-size:18px;font-weight:400;line-height:1.3;overflow-wrap:anywhere;color:#3E3A39}
+.ticket-card-star{color:#3E3A39;font-size:18px}
+.lists-ticket-date{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:10px;font-size:12px}
+.lists-ticket-date>span{font-size:15px}.lists-ticket-date small{color:#514b47}
+.lists-ticket-perforation{display:flex;align-items:center;gap:0;margin:12px -13px 10px}
+.lists-ticket-perforation span{width:8px;height:16px;flex:none;background:#FFFCF6;border:2px solid #3E3A39}
+.lists-ticket-perforation span:first-child{border-left:0;border-radius:0 10px 10px 0}
+.lists-ticket-perforation span:last-child{border-right:0;border-radius:10px 0 0 10px}
+.lists-ticket-perforation i{height:0;flex:1;border-top:2px dashed #3E3A39}
+.lists-ticket-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lists-ticket-bottom>div:first-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lists-ticket-bottom small{font-size:8px;letter-spacing:.1em;color:#514b47}
+.lists-ticket-bottom b{font-size:12px;overflow-wrap:anywhere}
+.lists-ticket-actions{display:flex;gap:5px;flex:none}
+.lists-ticket-actions button{min-width:35px;height:31px;padding:0 8px;border:2px solid #3E3A39;border-radius:10px;background:#FFFCF6;color:#3E3A39;font-size:11px}
+.lists-ticket-actions button+button{min-width:31px;padding:0;background:#F6D27A;font-size:16px}
+.lists-ticket-image-mark{display:inline-block;margin-top:8px;font-size:8px;letter-spacing:.08em;color:#514b47}
+.lists-ticket-side{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 4px;border-left:2px dashed #3E3A39;background:rgba(255,252,246,.35);text-align:center}
+.lists-ticket-side:before,.lists-ticket-side:after{content:"";position:absolute;left:-7px;width:12px;height:12px;border:2px solid #3E3A39;border-radius:50%;background:#FFFCF6}
+.lists-ticket-side:before{top:-8px}.lists-ticket-side:after{bottom:-8px}
+.lists-ticket-side span{font-size:8px;line-height:1.35;letter-spacing:.08em}
+.lists-ticket-side>b{font-size:25px}.lists-ticket-side small{font-size:8px;writing-mode:vertical-rl;letter-spacing:.12em}
+@media(max-width:430px){.lists-ticket-card{grid-template-columns:minmax(0,1fr) 42px}.lists-ticket-main{padding:12px 11px 10px}.lists-ticket-perforation{margin-left:-11px;margin-right:-11px}}
