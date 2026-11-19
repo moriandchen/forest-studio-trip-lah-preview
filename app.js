@@ -555,8 +555,9 @@ function deleteTrip(id){
   data.trips=data.trips.filter(t=>t.id!==id);
   if(wasActive){
     const next=data.trips.slice().sort((a,b)=>(a.status==='archived')-(b.status==='archived')||String(b.start).localeCompare(String(a.start)))[0];
-    data.activeTripId=next.id;
-    switchTrip(next.id);
+    const trips=data.trips,snapshot=clone(next.snapshot||seed);
+    data={...snapshot,version:5,trips,activeTripId:next.id,members:clone(next.members||[]),currencies:clone(next.currencies||['MYR']),baseCurrency:next.baseCurrency||'MYR'};
+    selectedTodayDate='';activePlaceFilter='All';save();
     showView('trips');renderTripManager();
   }else{
     save();renderTripManager();
