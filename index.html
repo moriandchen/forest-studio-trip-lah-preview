@@ -206,22 +206,43 @@
         <div id="expenseEmpty" class="empty-state hidden"><span>💸</span><b>還沒有旅費紀錄。</b><small>從第一筆旅途花費開始記錄吧。</small></div>
       </section>
 
-      <section id="more" class="view">
-        <div class="page-head"><button class="back">←</button><div><span class="eyebrow">MORE</span><h2>Travel tools</h2></div></div>
-        <div class="tool-list">
-          <button data-open="documents"><span>📄</span><div><b>Documents</b><small>Passport · Insurance · Booking refs</small></div><span>→</span></button>
-          <button data-open="gohome"><span>🏠</span><div><b>Go Home Check</b><small>Final room & airport checklist</small></div><span>→</span></button>
-          <button id="exportBackupBtn"><span>💾</span><div><b>Export Current Trip Backup</b><small id="backupStatus">Includes this trip’s records and ticket images</small></div><span>↓</span></button>
-          <button id="importBackupBtn"><span>↥</span><div><b>Import Trip Backup</b><small>Add or replace one trip from a backup</small></div><span>→</span></button>
-          <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" />
-          <button id="restoreRecoveryBtn" class="hidden"><span>↶</span><div><b>Undo Last Import</b><small>Restore the automatic safety snapshot</small></div><span>→</span></button>
-          <button id="cloudSetupBtn"><span>☁</span><div><b>Cloud Sync</b><small id="cloudMoreStatus">Local only · tap to connect</small></div><span>→</span></button>
-          <button id="cloudSyncNowBtn" class="hidden"><span>↻</span><div><b>Sync now</b><small>Check cloud for changes and upload this device</small></div><span>→</span></button>
-          <button id="cloudUseCloudBtn" class="hidden"><span>↓</span><div><b>Use cloud copy</b><small>Conflict only · replace this device with the cloud copy</small></div><span>→</span></button>
-          <button id="cloudForcePushBtn" class="hidden"><span>⇧</span><div><b>Use this device copy</b><small>Conflict only · overwrite the cloud copy</small></div><span>→</span></button>
-          <button id="cloudDisconnectBtn" class="hidden"><span>⛅</span><div><b>Disconnect Cloud</b><small>Keep local data on this device</small></div><span>→</span></button>
-          <button id="installAppBtn"><span>▣</span><div><b>Install Travel Lah!</b><small id="installStatus">Add it to your Home Screen</small></div><span>→</span></button>
-          <button id="resetDemo"><span>↺</span><div><b>Reset demo data</b><small>Restore first-view sample</small></div><span>→</span></button>
+      <section id="more" class="view more-page">
+        <div class="lists-topbar"><button class="back lists-back" aria-label="Back">←</button><div class="lists-brand">曼谷之旅 <span>✿</span></div></div>
+        <div class="lists-heading more-heading"><div><span class="eyebrow">YOUR LITTLE TRAVEL TOOLBOX</span><h2>旅途工具箱</h2><p>重要文件、備份和同步設定，都收在這裡。</p></div><div class="more-stamp">✈<small>TRAVEL<br>TOOLS</small></div></div>
+
+        <div class="more-group">
+          <div class="more-group-title"><div><span class="eyebrow">READY WHEN YOU NEED</span><h3>旅途準備</h3></div><span>🧳</span></div>
+          <div class="tool-list more-tool-list">
+            <button data-open="documents"><span class="more-tool-icon pink">📄</span><div><b>旅行文件</b><small>護照提醒 · 保險 · 訂單參考</small></div><span class="more-arrow">→</span></button>
+            <button data-open="gohome"><span class="more-tool-icon green">🏠</span><div><b>回家前檢查</b><small>退房、行李和機場前的最後確認</small></div><span class="more-arrow">→</span></button>
+          </div>
+        </div>
+
+        <div class="more-group">
+          <div class="more-group-title"><div><span class="eyebrow">KEEP YOUR RECORDS SAFE</span><h3>資料備份</h3></div><span>💾</span></div>
+          <div class="tool-list more-tool-list">
+            <button id="exportBackupBtn"><span class="more-tool-icon yellow">↓</span><div><b>匯出這趟旅程</b><small id="backupStatus">包含旅程紀錄與票券圖片</small></div><span class="more-arrow">↗</span></button>
+            <button id="importBackupBtn"><span class="more-tool-icon blue">↑</span><div><b>匯入旅程備份</b><small>從備份檔新增或還原一趟旅程</small></div><span class="more-arrow">↗</span></button>
+            <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" />
+            <button id="restoreRecoveryBtn" class="hidden"><span class="more-tool-icon pink">↶</span><div><b>復原上一次匯入</b><small>還原匯入前自動保存的安全快照</small></div><span class="more-arrow">↗</span></button>
+          </div>
+        </div>
+
+        <div class="more-group">
+          <div class="more-group-title"><div><span class="eyebrow">YOUR DATA, YOUR DEVICE</span><h3>雲端與裝置</h3></div><span>☁️</span></div>
+          <div class="tool-list more-tool-list">
+            <button id="cloudSetupBtn"><span class="more-tool-icon blue">☁</span><div><b>Cloud Sync 雲端同步</b><small id="cloudMoreStatus">僅儲存在本機 · 點擊設定連線</small></div><span class="more-arrow">↗</span></button>
+            <button id="cloudSyncNowBtn" class="hidden"><span class="more-tool-icon green">↻</span><div><b>立即同步</b><small>檢查雲端更新並同步這台裝置</small></div><span class="more-arrow">↗</span></button>
+            <button id="cloudUseCloudBtn" class="hidden"><span class="more-tool-icon blue">↓</span><div><b>使用雲端版本</b><small>發生衝突時，以雲端資料取代本機</small></div><span class="more-arrow">↗</span></button>
+            <button id="cloudForcePushBtn" class="hidden"><span class="more-tool-icon yellow">↑</span><div><b>使用這台裝置的版本</b><small>發生衝突時，以本機資料覆蓋雲端</small></div><span class="more-arrow">↗</span></button>
+            <button id="cloudDisconnectBtn" class="hidden"><span class="more-tool-icon pink">⛅</span><div><b>中斷雲端連線</b><small>保留這台裝置上的本機資料</small></div><span class="more-arrow">↗</span></button>
+            <button id="installAppBtn"><span class="more-tool-icon green">▣</span><div><b>安裝 Travel Lah!</b><small id="installStatus">加入主畫面，隨時打開旅程</small></div><span class="more-arrow">↗</span></button>
+          </div>
+        </div>
+
+        <div class="more-maintenance">
+          <div><span class="eyebrow">DEMO & RESET</span><b>示範資料</b><small>重設示範內容，回到初始展示狀態。</small></div>
+          <button id="resetDemo" aria-label="Reset demo data">↺</button>
         </div>
         <div class="version-note">Trip Lah! V1.0 · multi-trip travel workspace<br><span id="appRuntimeStatus">Checking offline support…</span></div>
       </section>
