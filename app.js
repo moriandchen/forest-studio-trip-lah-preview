@@ -455,6 +455,12 @@ function renderMoney(){
   qs('#moneySpent').textContent=`Spent ${moneyLabel(spent,baseCurrency)}`;
   qs('#moneyRemaining').textContent=moneyLabel(remaining,baseCurrency);
   qs('#moneySmall').textContent=`${moneyLabel(remaining,baseCurrency)} left`;
+  const prepaidHost=qs('#prepaidCostsList');
+  if(prepaidHost){
+    const prepaid=data.prepaidCosts||[];
+    const grouped={};prepaid.forEach(x=>{const key=x.currency||baseCurrency;grouped[key]=(grouped[key]||0)+Number(x.amount||0)});
+    prepaidHost.innerHTML=prepaid.length?prepaid.map(x=>`<div class="prepaid-cost-row"><div><b>${esc(x.name)}</b><small>${esc(x.payer||'')} · ${esc(x.status||'Paid')}</small></div><strong>${esc(x.currency||baseCurrency)} ${Number(x.amount||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></div>`).join('')+`<div class="prepaid-cost-totals">${Object.entries(grouped).map(([currency,total])=>`<span>${esc(currency)} ${total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`).join('')}</div>`:'<small class="prepaid-cost-empty">尚未記錄已付款費用。</small>';
+  }
   const byCategory={},byDate={};
   data.expenses.forEach(x=>{const rm=Number.isFinite(Number(x.rmAmount))?Number(x.rmAmount):Number(x.amount||0),category=x.category||'Other',date=x.date||data.trip.start||'';byCategory[category]=(byCategory[category]||0)+rm;if(date)byDate[date]=(byDate[date]||0)+rm});
   const categories=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]),dates=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0]));
