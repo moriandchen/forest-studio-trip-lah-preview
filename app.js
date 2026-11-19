@@ -357,10 +357,14 @@ function renderFundLedger(){
   qs('#fundTransactions').innerHTML=list.map(t=>{
     const member=(data.members||[]).find(m=>m.id===t.memberId),voided=t.status==='void';
     const incoming=t.direction==='in';
-    return `<div class="fund-transaction ${voided?'is-void':''}"><div><b>${incoming?'＋':'－'} ${esc(t.title||(incoming?'Agong contribution':'Agong expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}</small></div><div class="fund-transaction-side"><strong class="${incoming?'fund-in':'fund-out'}">${incoming?'+':'−'}${moneyLabel(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0),base)}</strong></div></div>`;
+    return `<div class="fund-transaction ${voided?'is-void':''}"><div class="fund-transaction-main"><b>${incoming?'＋':'－'} ${esc(t.title||(incoming?'Agong contribution':'Agong expense'))} ${voided?'<span class="fund-void-tag">VOID</span>':''}</b><small>${esc(t.date||'')} · ${esc(member?.name||'Unassigned')}</small></div><div class="fund-transaction-side"><strong class="${incoming?'fund-in':'fund-out'}">${incoming?'+':'−'}${moneyLabel(Number.isFinite(Number(t.baseAmount))?Number(t.baseAmount):Number(t.amount||0),base)}</strong><div class="fund-row-actions">${voided?`<button type="button" data-fund-restore="${esc(t.id)}">Restore</button>`:`<button type="button" data-fund-edit="${esc(t.id)}">Edit</button><button type="button" data-fund-void="${esc(t.id)}">Void</button>`}</div></div></div>`;
   }).join('');
   qs('#fundEmpty').classList.toggle('hidden',list.length>0);
+  qsa('[data-fund-edit]').forEach(b=>b.addEventListener('click',()=>editFundTransaction(b.dataset.fundEdit)));
+  qsa('[data-fund-void]').forEach(b=>b.addEventListener('click',()=>voidFundTransaction(b.dataset.fundVoid)));
+  qsa('[data-fund-restore]').forEach(b=>b.addEventListener('click',()=>restoreFundTransaction(b.dataset.fundRestore)));
 }
+
 function refundFundTransaction(id){
   const original=(data.fundLedger?.transactions||[]).find(t=>t.id===id);
   if(!original||original.direction!=='out'||original.type==='refund'||original.status==='void')return;
