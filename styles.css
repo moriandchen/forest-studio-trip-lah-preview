@@ -287,3 +287,40 @@ body{background:#FFFCF6;color:#3E3A39;font-family:"Huninn","PingFang TC","Micros
 @media(min-width:760px){body{padding:18px}.app-shell{background:#FFFCF6;border:3px solid #3E3A39;border-radius:28px;box-shadow:none}}
 @media(max-width:430px){.home-illustration{height:136px}.trip-hero{padding:15px}.home-illustration{margin:-15px -15px 14px}.trip-hero h1{font-size:34px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+
+/* Home alignment pass · based on 曼谷旅行手帖 reference */
+.home-illustration{
+  height:205px;margin:-18px -18px 15px;padding:0;background:#A8D3E6;
+  border-bottom:3px solid #3E3A39;overflow:hidden;
+}
+.home-illustration svg{width:100%;height:100%;object-fit:cover;display:block}
+.illustration-caption{font-family:"Huninn",sans-serif;background:#FFFCF6;border:2px solid #3E3A39}
+.hero-topline{margin:0 0 9px}
+.hero-topline .eyebrow{font-size:13px;letter-spacing:0}
+.trip-dates{
+  display:inline-flex;align-self:flex-start;width:max-content;
+  margin:0 0 9px;padding:4px 13px;border:3px solid #3E3A39;
+  border-radius:999px;background:#B9DAA5;color:#3E3A39;
+  font-family:"Huninn",sans-serif;font-size:14px;
+}
+.trip-hero h1{margin:2px 0 5px;font-size:34px;line-height:1.2}
+.home-tagline{margin:0;color:#655e59;font-size:14px;line-height:1.5}
+.home-prep-progress{margin-top:14px;padding-top:12px;border-top:3px solid #3E3A39}
+.home-countdown-card{
+  margin-top:14px;padding:13px 17px;background:#F2A497;
+  border:3px solid #3E3A39;border-radius:23px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.home-countdown-card>div:first-child{display:flex;flex-direction:column;gap:5px}
+.home-countdown-card>div:first-child span{font-size:15px}
+.home-countdown-card>div:first-child small{font-size:12px;opacity:.8}
+.home-countdown-card .countdown{margin:0;display:flex;align-items:baseline;gap:5px}
+.home-countdown-card .countdown span{font-family:"Huninn",sans-serif;font-size:54px;line-height:1}
+.home-countdown-card .countdown small{padding:0;font-size:17px}
+.phase-action{margin-top:14px}
+@media(max-width:430px){
+  .home-illustration{height:174px;margin:-15px -15px 13px}
+  .trip-hero h1{font-size:32px}
+  .home-countdown-card .countdown span{font-size:48px}
+}
